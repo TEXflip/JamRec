@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="Background">#1F161A</color>
+    <color name="SecondBackground">#595A4A</color>
+    <color name="Text">#DBCDC6</color>
+    <color name="MainForeground">#DBCDC6</color>
+    <color name="SecondForeground">#B0FE76</color>
+    <color name="ThirdForeground">#81E979</color>
+    <color name="Rec">#FF5858</color>
+    <color name="RecPressed">#FFFF7878</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>
