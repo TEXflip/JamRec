@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:navigationBarColor">@color/Background</item>
         <item name="colorPrimary">@color/SecondBackground</item>
         <item name="colorPrimaryDark">@color/Background</item>

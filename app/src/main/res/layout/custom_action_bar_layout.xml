@@ -21,7 +21,7 @@
             android:layout_marginStart="13dp"
             android:layout_marginTop="13dp"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/menu_icon"
+            android:background="@drawable/menu_icon_enable"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
