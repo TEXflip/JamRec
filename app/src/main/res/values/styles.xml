@@ -1,14 +1,11 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <item name="android:navigationBarColor">@color/Background</item>
         <item name="colorPrimary">@color/SecondBackground</item>
         <item name="colorPrimaryDark">@color/Background</item>
+        <item name="android:windowBackground">@color/Background</item>
         <item name="android:textColorPrimary">@color/MainForeground</item>
-    </style>
-
-    <style name="CustomTheme" parent="Theme.AppCompat.Light">
-
         <item name="contentInsetStart">0dp</item>
         <item name="contentInsetEnd">0dp</item>
     </style>
