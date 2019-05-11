@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:drawable="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -7,7 +8,6 @@
     android:background="@color/Background"
     android:fitsSystemWindows="true"
     android:gravity="bottom"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!--<android.support.design.widget.AppBarLayout-->
@@ -27,21 +27,84 @@
 
     <!--<include layout="@layout/content_main" />-->
 
-    <LinearLayout
-        xmlns:drawable="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:visibility="visible">
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/main_space"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        drawable:layout_constraintBottom_toTopOf="@+id/bottom_bar"
+        drawable:layout_constraintEnd_toEndOf="parent"
+        drawable:layout_constraintStart_toStartOf="parent"
+        drawable:layout_constraintTop_toBottomOf="@+id/action_bar">
 
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        drawable:layout_constraintBottom_toBottomOf="parent"
+        drawable:layout_constraintEnd_toEndOf="parent"
+        drawable:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/recButton"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:background="@drawable/player_rec" />
+            android:layout_width="85dp"
+            android:layout_height="85dp"
+            android:layout_marginStart="161dp"
+            android:layout_marginEnd="160dp"
+            android:background="@drawable/player_rec"
+            android:onClick="recButtonOnClick"
+            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintEnd_toEndOf="parent"
+            drawable:layout_constraintStart_toStartOf="parent"
+            drawable:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/playButton"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/play_arrow"
+            drawable:layout_constraintStart_toEndOf="@+id/recButton"
+            drawable:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/skipPreviousButton"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/skip_previous"
+            drawable:layout_constraintEnd_toStartOf="@+id/recButton"
+            drawable:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/action_bar"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="@color/Background"
+        android:scrollbarSize="0dp"
+        android:scrollbarTrackVertical="@null"
+        android:visibility="visible"
+        drawable:layout_constraintEnd_toEndOf="parent"
+        drawable:layout_constraintStart_toStartOf="parent"
+        drawable:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/menu_button"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/menu_icon"
+            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintStart_toStartOf="parent"
+            drawable:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</android.support.constraint.ConstraintLayout>
