@@ -53,6 +53,7 @@
             android:layout_marginStart="161dp"
             android:layout_marginEnd="160dp"
             android:background="@drawable/player_rec"
+            android:onClick="recButtonOnClick"
             drawable:layout_constraintBottom_toBottomOf="parent"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent"
