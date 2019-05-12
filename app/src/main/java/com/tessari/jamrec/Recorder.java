@@ -11,6 +11,7 @@ public class Recorder {
     private AudioTrack at = null;
     private boolean isRecording = false;
     private Thread recordingThread;
+    short[] data;
     private int bufferSize = 1024,
             sampleRate = 44100,
             audio_encoding = AudioFormat.ENCODING_PCM_16BIT,//cambiabile per mp3??
@@ -49,13 +50,17 @@ public class Recorder {
         at.stop();
     }
 
+    public short[] getData(){
+        return data;
+    }
+
     public boolean isRecording() {
         return isRecording;
     }
 
     private class RecordingThread extends Thread {
         public void run() {
-            short[] data = new short[bufferSize];
+            data = new short[bufferSize];
             while (isRecording) {
                 recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
                 at.write(data, 0, bufferSize, AudioTrack.WRITE_BLOCKING);
