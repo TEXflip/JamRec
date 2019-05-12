@@ -46,14 +46,17 @@
         drawable:layout_constraintEnd_toEndOf="parent"
         drawable:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <ToggleButton
             android:id="@+id/recButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
             android:layout_marginStart="161dp"
             android:layout_marginEnd="160dp"
             android:background="@drawable/player_rec"
+            android:stateListAnimator="@animator/animate_rec_button"
             android:onClick="recButtonOnClick"
+            android:textOn=""
+            android:textOff=""
             drawable:layout_constraintBottom_toBottomOf="parent"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent"

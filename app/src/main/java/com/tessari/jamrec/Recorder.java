@@ -14,8 +14,8 @@ public class Recorder {
     private int bufferSize = 1024,
             sampleRate = 44100,
             audio_encoding = AudioFormat.ENCODING_PCM_16BIT,//cambiabile per mp3??
-            audio_channel_in = AudioFormat.CHANNEL_IN_MONO,
-            audio_channel_out = AudioFormat.CHANNEL_OUT_MONO;
+            audio_channel_in = AudioFormat.CHANNEL_IN_STEREO,
+            audio_channel_out = AudioFormat.CHANNEL_OUT_STEREO;
 
     public Recorder() {
         recorder = new AudioRecord.Builder()
@@ -45,14 +45,11 @@ public class Recorder {
     public void stop() {
         isRecording = false;
         recorder.stop();
-        recorder.release();
-        recorder = null;
         recordingThread = null;
         at.stop();
-        at.release();
     }
 
-    public boolean isRecording(){
+    public boolean isRecording() {
         return isRecording;
     }
 

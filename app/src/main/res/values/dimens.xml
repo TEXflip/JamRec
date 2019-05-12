@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <item name="rec_button_pressed_scale" type="dimen" format="float">0.88</item>
+    <item name="rec_button_enable_scale" type="dimen" format="float">1</item>
 </resources>

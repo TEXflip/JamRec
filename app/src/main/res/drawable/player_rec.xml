@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/rec_icon_enable" android:state_pressed="false"/>
-    <item android:drawable="@drawable/rec_icon_pressed"/>
-</selector>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+
+    <item
+        android:id="@+id/rec_button_active"
+        android:drawable="@drawable/stop_icon"
+        android:state_checked="true" />
+
+    <item
+        android:id="@+id/rec_button_enable"
+        android:drawable="@drawable/rec_icon" />
+
+    <transition
+        android:fromId="@id/rec_button_enable"
+        android:toId="@id/rec_button_active">
+        <aapt:attr name="android:drawable">
+            <animated-vector android:drawable="@drawable/stop_icon">
+                <target android:name="path">
+                    <aapt:attr name="android:animation">
+                        <objectAnimator
+                            android:duration="300"
+                            android:interpolator="@android:interpolator/accelerate_cubic"
+                            android:propertyName="pathData"
+                            android:valueFrom="M 18 12 C 18 15.31371 15.31371 18 12 18 8.68629 18 6 15.31371 6 12 6 8.68629 8.68629 6 12 6 15.31371 6 18 8.68629 18 12"
+                            android:valueTo="M 18 12 C 18 18 18 18 12 18 6 18 6 18 6 12 6 6 6 6 12 6 18 6 18 6 18 12"
+                            android:valueType="pathType" />
+                    </aapt:attr>
+                </target>
+            </animated-vector>
+        </aapt:attr>
+    </transition>
+
+    <transition
+        android:fromId="@id/rec_button_active"
+        android:toId="@id/rec_button_enable">
+        <aapt:attr name="android:drawable">
+            <animated-vector android:drawable="@drawable/rec_icon">
+                <target android:name="path">
+                    <aapt:attr name="android:animation">
+                        <objectAnimator
+                            android:duration="300"
+                            android:interpolator="@android:interpolator/accelerate_cubic"
+                            android:propertyName="pathData"
+                            android:valueFrom="M 18 12 C 18 18 18 18 12 18 6 18 6 18 6 12 6 6 6 6 12 6 18 6 18 6 18 12"
+                            android:valueTo="M 18 12 C 18 15.31371 15.31371 18 12 18 8.68629 18 6 15.31371 6 12 6 8.68629 8.68629 6 12 6 15.31371 6 18 8.68629 18 12"
+                            android:valueType="pathType" />
+                    </aapt:attr>
+                </target>
+            </animated-vector>
+        </aapt:attr>
+    </transition>
+</animated-selector>
