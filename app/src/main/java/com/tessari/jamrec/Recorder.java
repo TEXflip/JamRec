@@ -8,18 +8,13 @@ import android.media.MediaRecorder;
 
 public class Recorder {
     private AudioRecord recorder = null;
-    private AudioTrack at = null;
     private Track track = null;
     private Boolean isRecording = false;
     private Thread recordingThread;
     short[] data;
-    private int bufferSize = 1024,
-            sampleRate = 44100,
-            audio_encoding = AudioFormat.ENCODING_PCM_16BIT,//cambiabile per mp3??
-            audio_channel_in = AudioFormat.CHANNEL_IN_STEREO,
-            audio_channel_out = AudioFormat.CHANNEL_OUT_STEREO;
+    private int bufferSize, sampleRate, audio_encoding, audio_channel_in;
 
-    public Recorder() {
+    public Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in) {
         recorder = new AudioRecord.Builder()
                 .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
                 .setAudioFormat(new AudioFormat.Builder()
@@ -29,11 +24,10 @@ public class Recorder {
                         .build())
                 .setBufferSizeInBytes(bufferSize)
                 .build();
-
-        at = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
-                audio_channel_out,
-                audio_encoding, bufferSize,
-                AudioTrack.MODE_STREAM);
+        this.sampleRate = sampleRate;
+        this.bufferSize = bufferSize;
+        this.audio_encoding = audio_encoding;
+        this.audio_channel_in = audio_channel_in;
     }
 
     public void startToRec() {
@@ -41,7 +35,6 @@ public class Recorder {
         recorder.startRecording();
         isRecording = true;
         recordingThread = new RecordingThread();
-        at.play();
         recordingThread.start();
     }
 
@@ -49,7 +42,6 @@ public class Recorder {
         isRecording = false;
         recorder.stop();
         recordingThread = null;
-        at.stop();
     }
 
     public short[] getData(){
@@ -75,7 +67,6 @@ public class Recorder {
             data = new short[bufferSize];
             while (isRecording) {
                 recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
-                at.write(data, 0, bufferSize, AudioTrack.WRITE_BLOCKING);
                 if(track != null)
                     track.write(data);
             }
