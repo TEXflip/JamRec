@@ -1,8 +1,10 @@
 package com.tessari.jamrec;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
+import android.media.AudioManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     Recorder rec;
     Thread audioVisual;
     AudioCanvas canvas;
+    Track track;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +26,16 @@ public class MainActivity extends AppCompatActivity {
 
         canvas = (AudioCanvas) findViewById(R.id.audioCanvas);
 
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+//        audioManager.setMicrophoneMute(true);
+
         rec = new Recorder();
+        track = new Track();
+        rec.setTrack(track);
+        canvas.setTrack(track);
+
+
+
         startUIupdateThread(16);
     }
 
@@ -47,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 if(rec.isRecording()) {
-                                    canvas.setLines(rec.getData());
                                     canvas.invalidate();
                                 }
                             }

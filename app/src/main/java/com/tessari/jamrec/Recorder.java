@@ -9,7 +9,8 @@ import android.media.MediaRecorder;
 public class Recorder {
     private AudioRecord recorder = null;
     private AudioTrack at = null;
-    private boolean isRecording = false;
+    private Track track = null;
+    private Boolean isRecording = false;
     private Thread recordingThread;
     short[] data;
     private int bufferSize = 1024,
@@ -36,6 +37,7 @@ public class Recorder {
     }
 
     public void startToRec() {
+
         recorder.startRecording();
         isRecording = true;
         recordingThread = new RecordingThread();
@@ -54,9 +56,19 @@ public class Recorder {
         return data;
     }
 
+    public int getBufferSize(){
+        return bufferSize;
+    }
+
+    public void setTrack(Track t){
+        track = t;
+    }
+
     public boolean isRecording() {
         return isRecording;
     }
+
+    public Boolean getIsRecording() { return isRecording; }
 
     private class RecordingThread extends Thread {
         public void run() {
@@ -64,6 +76,8 @@ public class Recorder {
             while (isRecording) {
                 recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
                 at.write(data, 0, bufferSize, AudioTrack.WRITE_BLOCKING);
+                if(track != null)
+                    track.write(data);
             }
         }
     }

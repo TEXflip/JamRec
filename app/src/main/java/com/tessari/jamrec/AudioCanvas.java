@@ -4,42 +4,83 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+
+import java.nio.ShortBuffer;
 
 public class AudioCanvas extends View {
 
-    private Rect rect;
     private Paint paint;
-    short[] lines;
-    float top = 400;
+    private Track track = null;
+    int offset = 0;
+    int strech = 1024;
+    int precSize = 0;
+    int currentX = 0;
+    boolean autoMove = true;
+    int bufferSize = 1024;
 
 
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
-        rect = new Rect(100, 400, 200, 500);
-        lines = new short[0];
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.rgb(255, 255, 255));
         paint.setStyle(Paint.Style.FILL);
     }
 
-    public void addTop(float add) {
-        top = 400 + add;
-    }
-
-    public void setLines(short[] lines) {
-        this.lines = lines;
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int i = 0; i < lines.length; i++) {
-            canvas.drawLine(80+i, 500, 80+i, 400+lines[i], paint);
+        int width = this.getWidth() - 150;
+        for (int i = 0; i < width; i++) {
+            canvas.drawLine(80 + (i),
+                    399,
+                    80 + (i),
+                    400 + readNormalized(i), paint);
         }
+        if (track.size() > width * strech * 0.6 && autoMove)
+            sumOffset((track.size() - precSize) / strech);
+        precSize = track.size();
+    }
 
-//        canvas.drawRect(100, top, 200, 500, paint);
+    private float readNormalized(int index) {
+        if (track == null)
+            return 0;
+        float val = 0;
+        int precision = 9;
+        for(int i = -(precision/2); i < precision/2; i++){
+            val += track.read((offset + strech * index)+i);
+        }
+        val /= precision;
+//      val = (100/Short.MAX_VALUE) * val;
+
+
+        return val;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                currentX = x;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                sumOffset(currentX - x);
+                currentX = x;
+                invalidate();
+                break;
+        }
+        return true;
+    }
+
+    private void sumOffset(int x) {
+        offset += x * strech;
+    }
+
+    public void setTrack(Track t) {
+        track = t;
     }
 }
