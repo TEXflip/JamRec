@@ -2,61 +2,54 @@ package com.tessari.jamrec;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.nio.ShortBuffer;
-
 public class AudioCanvas extends View {
 
-    private Paint paint;
+    private Paint wavesColor,controlBarColor;
     private Track track = null;
     int offset = 0;
-    int strech = 1024;
+    int strech = 1;
     int precSize = 0;
     int currentX = 0;
     boolean autoMove = true;
-    int bufferSize = 1024;
 
 
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.rgb(255, 255, 255));
-        paint.setStyle(Paint.Style.FILL);
+        wavesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+        wavesColor.setColor(ResourcesCompat.getColor(getResources(),R.color.MainForeground, null));
+        wavesColor.setStyle(Paint.Style.FILL);
+        controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+        controlBarColor.setColor(ResourcesCompat.getColor(getResources(),R.color.Rec, null));
+        controlBarColor.setStyle(Paint.Style.FILL);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        int width = this.getWidth() - 150;
+        int width = this.getWidth();
+        int height = this.getHeight();
         for (int i = 0; i < width; i++) {
-            canvas.drawLine(80 + (i),
-                    399,
-                    80 + (i),
-                    400 + readNormalized(i), paint);
+            float val = readNormalized(i);
+            canvas.drawLine(i,height/2 - val -1, i,height/2 + val, wavesColor);
         }
         if (track.size() > width * strech * 0.6 && autoMove)
             sumOffset((track.size() - precSize) / strech);
+        canvas.drawLine(-offset+track.size(),height-height/4,-offset+track.size(),height/4,controlBarColor);
         precSize = track.size();
     }
 
     private float readNormalized(int index) {
         if (track == null)
             return 0;
-        float val = 0;
-        int precision = 9;
-        for(int i = -(precision/2); i < precision/2; i++){
-            val += track.read((offset + strech * index)+i);
-        }
-        val /= precision;
-//      val = (100/Short.MAX_VALUE) * val;
-
-
+        float val = track.read(offset + strech * index);
+        val /= 4;
         return val;
     }
 

@@ -7,14 +7,18 @@ import java.util.Vector;
 public class Track {
 
     Vector<Short> track;
+    int nAverages = 1;
 
     public Track(){
         track = new Vector<>();
     }
 
-    public void write(short[] elem){
-        for(int i = 0; i < elem.length; i++){
-            track.add(elem[i]);
+    public void write(short[] elem) {
+        for (int a = 0; a < nAverages; a++) {
+            int average = 0;
+            for (int i = 0; i < elem.length/nAverages; i++)
+                average += elem[i];
+            track.add((short) (average / elem.length));
         }
     }
 
@@ -25,7 +29,6 @@ public class Track {
     public short read(int index){
         if(index >= track.size() || index < 0)
             return 0;
-//        Log.i("-------------------------", "size = "+String.valueOf(track.size())+" ,Index = "+String.valueOf(index));
         return track.get(index);
     }
 }

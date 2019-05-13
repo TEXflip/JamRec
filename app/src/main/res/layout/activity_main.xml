@@ -38,11 +38,9 @@
 
         <com.tessari.jamrec.AudioCanvas
             android:id="@+id/audioCanvas"
-            android:layout_width="395dp"
+            android:layout_width="0dp"
             android:layout_height="200dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="4dp"
             drawable:layout_constraintBottom_toBottomOf="parent"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent">
