@@ -34,22 +34,44 @@ public class AudioCanvas extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    protected void onDraw(Canvas c) {
+        super.onDraw(c);
         int width = this.getWidth();
         int height = this.getHeight();
         int size = track == null ? 0 : track.size();
+        //Path path = new
         for (int i = 0; i < width; i++) {
             float val = readNormalized(i);
-            canvas.drawLine(i, height / 2 - val - 1, i, height / 2 + val, wavesColor);
+            
+            c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesColor);
         }
-        if (size > width * strech * 0.6 && autoMove)
+        if (size > width * strech * 0.6f && autoMove)
             sumOffset((size - precSize) / strech);
-        canvas.drawLine(-offset + size, height - height / 4, -offset + size, height / 4, controlBarColor);
-        canvas.drawLine(track.bufferPos-offset, height, track.bufferPos-offset, 0, blue);
+        drawLineRelative(c, controlBarColor, size, height - height / 4f, height / 4f);
+        drawLineRelative(c, blue, track.playerBufferPos, height, 0);
         precSize = size;
     }
 
+    /**
+     * Disegna una linea verticale con la posizione relativa all'offset e allo stretch
+     * della linea del tempo
+     *
+     * @param canvas
+     * @param paint
+     * @param x
+     * @param y1     y sotto
+     * @param y2     y sopra
+     */
+    private void drawLineRelative(Canvas canvas, Paint paint, float x, float y1, float y2) {
+        canvas.drawLine(x - offset, y1, x - offset, y2, paint);
+    }
+
+    /**
+     * legge il valore della trackVisualization e lo normalizza
+     *
+     * @param index
+     * @return
+     */
     private float readNormalized(int index) {
         if (track == null)
             return 0;

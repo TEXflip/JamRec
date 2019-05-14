@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,9 +32,22 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 
         canvas = (AudioCanvas) findViewById(R.id.audioCanvas);
+        ((SeekBar)findViewById(R.id.test_bar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                canvas.strech = i;
+            }
 
-//        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        audioManager.setMicrophoneMute(true);
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         session = new SessionManager(sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
         startUIupdateThread(16);

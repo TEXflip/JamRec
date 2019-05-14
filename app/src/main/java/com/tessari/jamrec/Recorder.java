@@ -31,9 +31,9 @@ public class Recorder {
     }
 
     public void startToRec() {
-        recorder.startRecording();
         isRecording = true;
         recordingThread = session.new RecordingThread();
+        recorder.startRecording();
         recordingThread.start();
     }
 
