@@ -7,14 +7,13 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 
 public class Recorder {
-    private AudioRecord recorder = null;
-    private Track track = null;
-    private Boolean isRecording = false;
+    private AudioRecord recorder;
+    private SessionManager session;
+    private boolean isRecording = false;
     private Thread recordingThread;
-    short[] data;
-    private int bufferSize, sampleRate, audio_encoding, audio_channel_in;
+    private int bufferSize;//, sampleRate, audio_encoding, audio_channel_in;
 
-    public Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in) {
+    public Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, SessionManager session) {
         recorder = new AudioRecord.Builder()
                 .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
                 .setAudioFormat(new AudioFormat.Builder()
@@ -24,17 +23,18 @@ public class Recorder {
                         .build())
                 .setBufferSizeInBytes(bufferSize)
                 .build();
-        this.sampleRate = sampleRate;
+        this.session = session;
         this.bufferSize = bufferSize;
-        this.audio_encoding = audio_encoding;
-        this.audio_channel_in = audio_channel_in;
+//        this.sampleRate = sampleRate;
+//        this.audio_encoding = audio_encoding;
+//        this.audio_channel_in = audio_channel_in;
     }
 
     public void startToRec() {
 
         recorder.startRecording();
         isRecording = true;
-        recordingThread = new RecordingThread();
+        recordingThread = session.new RecordingThread();
         recordingThread.start();
     }
 
@@ -44,32 +44,23 @@ public class Recorder {
         recordingThread = null;
     }
 
-    public short[] getData(){
-        return data;
-    }
-
-    public int getBufferSize(){
-        return bufferSize;
-    }
-
-    public void setTrack(Track t){
-        track = t;
+    public void read(short[] data){
+        recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
     }
 
     public boolean isRecording() {
         return isRecording;
     }
 
-    public Boolean getIsRecording() { return isRecording; }
-
-    private class RecordingThread extends Thread {
-        public void run() {
-            data = new short[bufferSize];
-            while (isRecording) {
-                recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
-                if(track != null)
-                    track.write(data);
-            }
-        }
-    }
+    //    private class RecordingThread extends Thread {
+//        public void run() {
+//            data = new short[bufferSize];
+//            while (isRecording) {
+//                recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
+//                if(track != null)
+//                    track.write(data);
+//                canvas.invalidate();
+//            }
+//        }
+//    }
 }

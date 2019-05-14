@@ -12,11 +12,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
     Recorder rec;
     AudioCanvas canvas;
+    SessionManager session;
     Track track;
     int bufferSize = 1024, sampleRate = 44100, audio_encoding = AudioFormat.ENCODING_PCM_16BIT, audio_channel_in = AudioFormat.CHANNEL_IN_STEREO, audio_channel_out = AudioFormat.CHANNEL_OUT_STEREO;
 
@@ -33,53 +35,51 @@ public class MainActivity extends AppCompatActivity {
 //        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 //        audioManager.setMicrophoneMute(true);
 
-        rec = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in);
-        track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out);
-        rec.setTrack(track);
-        canvas.setTrack(track);
-
-
-        startUIupdateThread(16);
+        session = new SessionManager(sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
+        //startUIupdateThread(16);
     }
 
 
     public void recButtonOnClick(View v) {
-        if (!rec.isRecording())
-            rec.startToRec();
+        if (!session.recorder.isRecording())
+            session.recorder.startToRec();
         else
-            rec.stop();
+            session.recorder.stop();
     }
 
-    public void playButtonOnClick(View v){
-        if(!rec.isRecording()){
-            if(!track.isPlaying())
-                track.play();
+    public void playButtonOnClick(View v) {
+        if (!session.recorder.isRecording()) {
+            if (!session.track.isPlaying())
+                session.track.play();
             else
-                track.pause();
+                session.track.pause();
         }
     }
 
     private void startUIupdateThread(final int millis) {
+        final AudioCanvasUpdate update = new AudioCanvasUpdate();
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
                     while (!this.isInterrupted()) {
                         Thread.sleep(millis);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (rec.isRecording()) {
-                                    canvas.invalidate();
-                                }
-                            }
-                        });
+                        runOnUiThread(update);
                     }
                 } catch (InterruptedException e) {
+                    Log.e("InterruptedException", e.getMessage());
                 }
             }
         };
         thread.start();
+    }
+
+    private class AudioCanvasUpdate implements Runnable {
+        @Override
+        public void run() {
+            if (rec.isRecording())
+                canvas.invalidate();
+        }
     }
 
 }
