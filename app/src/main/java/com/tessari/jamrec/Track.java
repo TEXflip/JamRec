@@ -35,8 +35,8 @@ public class Track {
     }
 
     public void pause(){
+        isPlaying = false; // prima cosa da fare o audioTrack.write() non blocca
         audioTrack.pause();
-        isPlaying = false;
         playerThread = null;
     }
 

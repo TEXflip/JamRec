@@ -16,8 +16,9 @@ public class SessionManager {
 
     public class RecordingThread extends Thread {
         public void run() {
-            short[] data = new short[bufferSize];
+            short[] data;
             while (recorder.isRecording()) {
+                data = new short[bufferSize];
                 recorder.read(data);
                 if (track != null)
                     track.write(data);

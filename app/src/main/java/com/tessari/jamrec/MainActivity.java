@@ -14,9 +14,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
-    Recorder rec;
     AudioCanvas canvas;
     SessionManager session;
     Track track;
@@ -36,24 +36,29 @@ public class MainActivity extends AppCompatActivity {
 //        audioManager.setMicrophoneMute(true);
 
         session = new SessionManager(sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
-        //startUIupdateThread(16);
+        startUIupdateThread(16);
     }
 
 
     public void recButtonOnClick(View v) {
-        if (!session.recorder.isRecording())
+//        if(!session.track.isPlaying()) {
+        if (!session.recorder.isRecording()) {
             session.recorder.startToRec();
-        else
+            ((ToggleButton) v).setChecked(true);
+        } else {
             session.recorder.stop();
+            ((ToggleButton) v).setChecked(false);
+        }
+//        }
+//        else
+//            ((ToggleButton)v).setChecked(false);
     }
 
     public void playButtonOnClick(View v) {
-        if (!session.recorder.isRecording()) {
-            if (!session.track.isPlaying())
-                session.track.play();
-            else
-                session.track.pause();
-        }
+        if (!session.track.isPlaying())
+            session.track.play();
+        else
+            session.track.pause();
     }
 
     private void startUIupdateThread(final int millis) {
@@ -77,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private class AudioCanvasUpdate implements Runnable {
         @Override
         public void run() {
-            if (rec.isRecording())
-                canvas.invalidate();
+            canvas.invalidate();
         }
     }
 
