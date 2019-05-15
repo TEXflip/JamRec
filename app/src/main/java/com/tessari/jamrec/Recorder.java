@@ -1,19 +1,17 @@
 package com.tessari.jamrec;
 
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.AudioTrack;
 import android.media.MediaRecorder;
 
-public class Recorder {
+class Recorder {
     private AudioRecord recorder;
     private SessionManager session;
     private boolean isRecording = false;
     private Thread recordingThread;
-    private int bufferSize;//, sampleRate, audio_encoding, audio_channel_in;
+    private int bufferSize;
 
-    public Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, SessionManager session) {
+    Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, SessionManager session) {
         recorder = new AudioRecord.Builder()
                 .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
                 .setAudioFormat(new AudioFormat.Builder()
@@ -25,41 +23,34 @@ public class Recorder {
                 .build();
         this.session = session;
         this.bufferSize = bufferSize;
-//        this.sampleRate = sampleRate;
-//        this.audio_encoding = audio_encoding;
-//        this.audio_channel_in = audio_channel_in;
     }
 
-    public void startToRec() {
+    void startToRec() {
         isRecording = true;
-        recordingThread = session.new RecordingThread();
+        recordingThread = new RecordingThread();
         recorder.startRecording();
         recordingThread.start();
     }
 
-    public void stop() {
+    void stop() {
         isRecording = false;
         recorder.stop();
         recordingThread = null;
     }
 
-    public void read(short[] data){
-        recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
-    }
-
-    public boolean isRecording() {
+    boolean isRecording() {
         return isRecording;
     }
 
-    //    private class RecordingThread extends Thread {
-//        public void run() {
-//            data = new short[bufferSize];
-//            while (isRecording) {
-//                recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
-//                if(track != null)
-//                    track.write(data);
-//                canvas.invalidate();
-//            }
-//        }
-//    }
+    public class RecordingThread extends Thread {
+        public void run() {
+            short[] data;
+            while (isRecording) {
+                data = new short[bufferSize];
+                recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
+                session.track.write(data);
+                session.updateCanvas();
+            }
+        }
+    }
 }
