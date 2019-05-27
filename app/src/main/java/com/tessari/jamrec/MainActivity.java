@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,34 +32,43 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 
         canvas = (AudioCanvas) findViewById(R.id.audioCanvas);
-
-//        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        audioManager.setMicrophoneMute(true);
+//        ((SeekBar)findViewById(R.id.test_bar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//               // canvas.stretch = i;
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
         session = new SessionManager(sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
-        startUIupdateThread(16);
+//        startUIupdateThread(16);
     }
 
 
     public void recButtonOnClick(View v) {
-//        if(!session.track.isPlaying()) {
-        if (!session.recorder.isRecording()) {
-            session.recorder.startToRec();
+        if (!session.isRecording()) {
+            session.startRec();
             ((ToggleButton) v).setChecked(true);
         } else {
-            session.recorder.stop();
+            session.stopRec();
             ((ToggleButton) v).setChecked(false);
         }
-//        }
-//        else
-//            ((ToggleButton)v).setChecked(false);
     }
 
     public void playButtonOnClick(View v) {
-        if (!session.track.isPlaying())
-            session.track.play();
+        if (!session.isPlaying())
+            session.startPlay();
         else
-            session.track.pause();
+            session.pausePlay();
     }
 
     private void startUIupdateThread(final int millis) {
