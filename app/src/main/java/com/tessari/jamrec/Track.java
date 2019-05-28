@@ -12,7 +12,7 @@ class Track {
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
-    private float bufferDividerFactor = 4; // numero di campioni compressi in uno per la traccia di visualizzazione
+    private float bufferDividerFactor = 1; // numero di campioni compressi in uno per la traccia di visualizzazione
     private int bufferDivider, bufferSize, playerBufferPos = 0;
     private boolean isPlaying = false;
 
@@ -65,21 +65,22 @@ class Track {
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (playerBufferPos >= trackSamples.size() * bufferDivider) {
-                    pause();
+                if (playerBufferPos >= trackSamples.size()) {
+                    session.pausePlay();
                     break;
                 }
-                for (int i = 0; i < bufferDivider; i++) {
-                    audioTrack.write(trackSamples.get(playerBufferPos / bufferDivider), (bufferSize / bufferDivider) * i, bufferSize / bufferDivider, AudioTrack.WRITE_BLOCKING);
-                    playerBufferPos++;
-                }
+//                for (int i = 0; i < bufferDivider; i++) {
+//                    audioTrack.write(trackSamples.get(playerBufferPos / bufferDivider), (bufferSize / bufferDivider) * i, bufferSize / bufferDivider, AudioTrack.WRITE_BLOCKING);
+                audioTrack.write(trackSamples.get(playerBufferPos), 0, bufferSize, AudioTrack.WRITE_BLOCKING);
+                playerBufferPos++;
+//                }
                 session.updateCanvas();
             }
         }
     }
 
     int getPlayerBufferPos() {
-        return playerBufferPos;
+        return playerBufferPos*bufferSize;
     }
 
     int size() {

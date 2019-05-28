@@ -48,20 +48,17 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
-
-        session = new SessionManager(sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
+        bufferSize = 1024;// AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding)
+        session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
 //        startUIupdateThread(16);
     }
 
 
     public void recButtonOnClick(View v) {
-        if (!session.isRecording()) {
+        if (!session.isRecording())
             session.startRec();
-            ((ToggleButton) v).setChecked(true);
-        } else {
+        else
             session.stopRec();
-            ((ToggleButton) v).setChecked(false);
-        }
     }
 
     public void playButtonOnClick(View v) {
