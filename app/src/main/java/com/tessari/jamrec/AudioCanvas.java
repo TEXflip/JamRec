@@ -1,19 +1,26 @@
 package com.tessari.jamrec;
 
 import android.content.Context;
+import android.gesture.GestureLibrary;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 public class AudioCanvas extends View {
 
     private ScaleGestureDetector stretchDetector;
+    private GestureDetector scrollDetector;
     private int[] trackView;
     private Paint wavesColor, controlBarColor, blue;
     private Track track = null;
@@ -27,6 +34,7 @@ public class AudioCanvas extends View {
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
         stretchDetector = new ScaleGestureDetector(c, new StretchListener());
+        scrollDetector = new GestureDetector(c, new ScrollListener());
         wavesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
         wavesColor.setStyle(Paint.Style.FILL);
@@ -40,7 +48,7 @@ public class AudioCanvas extends View {
             @Override
             public void run() {
                 width = getWidth();
-                trackViewWidth = width * 280;
+                trackViewWidth = width * 300;
                 offset = trackViewWidth / 2;
                 trackView = new int[width];
                 for (int i = 0; i < trackView.length; i++)
@@ -54,19 +62,20 @@ public class AudioCanvas extends View {
         super.onDraw(c);
         int height = this.getHeight();
         int size = track == null ? 0 : track.size();
-        float precVal = readNormalized(0);
-        String print = "";
+
+        if (size > fromViewIndexToSamplesIndex((int) (width * 0.75)) && autoMove)
+            sumOffsetNotRel(size - precSize);
+
         for (int i = 0; i < width; i++) {
             float val = readNormalized(i);
-//            c.drawLine(i-1, height / 2f + precVal, i, height / 2f + 1 + val, wavesColor);
-//            precVal = val;
             c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesColor);
 
         }
+
         drawLineRelative(c, controlBarColor, size, height - height / 4f, height / 4f);
         drawLineRelative(c, blue, track.getPlayerBufferPos(), height, 0);
-        if (size > fromViewIndexToSamplesIndex((int) (width * 0.75)) && autoMove)
-            sumOffset(fromSamplesIndexToViewIndex(size) - fromSamplesIndexToViewIndex(precSize));
+
+
         precSize = size;
     }
 
@@ -80,8 +89,8 @@ public class AudioCanvas extends View {
      * @param y1     y sotto
      * @param y2     y sopra
      */
-    private void drawLineRelative(Canvas canvas, Paint paint, float x, float y1, float y2) {
-        canvas.drawLine(fromSamplesIndexToViewIndexFloat(x), y1, fromSamplesIndexToViewIndexFloat(x), y2, paint);
+    private void drawLineRelative(Canvas canvas, Paint paint, int x, float y1, float y2) {
+        canvas.drawLine(fromSamplesIndexToViewIndex(x), y1, fromSamplesIndexToViewIndex(x), y2, paint);
     }
 
     /**
@@ -99,45 +108,55 @@ public class AudioCanvas extends View {
     }
 
     private int fromViewIndexToSamplesIndex(int i) {
-        int widthRatio = floorDiv(trackViewWidth , width);
-        int offsetMod = floorMod(offset,widthRatio);
+        // il rapporto dev'essere approssimato per difetto
+        int widthRatio = floorDiv(trackViewWidth, width);
+
+        // viene preso il valore dell'offset piú vicino ad un multiplo del widthRatio
+        // per mantenere gli stessi valori durante lo slide della traccia
+        int offsetMod = floorMod(offset, widthRatio);
+
+        // centro l'offset per avere uno zoom centrale durante la ScaleGesture
         int start2 = (offsetMod - trackViewWidth / 2);
-        return start2 + (i * widthRatio);
+
+        // quando é molto zoommato l'approssimazione del widthRatio rende lo zoom scattoso, in questo modo si aggira il problema
+        float retWidthRatio = widthRatio <= 18 ? ((float)trackViewWidth / (float)width) : widthRatio;
+
+        return start2 + (int)(i * retWidthRatio);
     }
 
-
-
     private int fromSamplesIndexToViewIndex(int i) {
-        float start2 = 0f;
-        float stop2 = width;
-        float start1 = (offset - trackViewWidth / 2f);
-        float stop1 = (offset + trackViewWidth / 2f);
-        float map = (((i - offset) - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
-        return (int) map;
+        double start1 = offset - trackViewWidth / 2f;
+        return (int) (((i - start1) / trackViewWidth) * width);
     }
 
     private float fromSamplesIndexToViewIndexFloat(float i) {
+        float tvw = trackViewWidth;
         float width = (float) this.width;
-        float start1 = (offset - trackViewWidth / 2f);
-        float map = ((i - start1) / trackViewWidth) * width;
-        return map;
+        float start1 = offset - tvw / 2f;
+        return ((i - start1) / tvw) * width;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        int x1 = (int) e.getX(0);
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                precX = x1;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                sumOffset(precX - x1);
-                precX = x1;
-                invalidate();
-                break;
-            case MotionEvent.ACTION_BUTTON_RELEASE:
-                break;
-        }
+//        int x1 = 0;
+//        for (int i = 0; i < e.getPointerCount(); i++)
+//            x1 += (int) e.getX(i);
+//        x1 /= e.getPointerCount();
+//        switch (e.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                precX = x1;
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                if(e.getPointerCount()>1) precX = x1;
+//                sumOffset(precX - x1);
+//                precX = x1;
+//                invalidate();
+//                break;
+//            case MotionEvent.ACTION_BUTTON_RELEASE:
+//                if(e.getPointerCount()>0)
+//                break;
+//        }
+        scrollDetector.onTouchEvent(e);
         stretchDetector.onTouchEvent(e);
         return true;
     }
@@ -153,6 +172,10 @@ public class AudioCanvas extends View {
         offset += x * (trackViewWidth / width);
     }
 
+    private void sumOffsetNotRel(int x){
+        offset += x;
+    }
+
     public void setTrack(Track t) {
         track = t;
     }
@@ -166,6 +189,16 @@ public class AudioCanvas extends View {
         }
     }
 
+    private class ScrollListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            sumOffset((int)v);
+            invalidate();
+            return  true;
+        }
+    }
+
+
     // Funzione di Math non presente nella min API
     private static int floorDiv(int a, int b) {
         int r = a / b;
@@ -173,8 +206,9 @@ public class AudioCanvas extends View {
             r--;
         return r;
     }
+
     // Funzione di Math non presente nella min API
-    private static int floorMod(double a, int b) {
-        return (int)Math.floor(a / (double)b) * b;
+    private static int floorMod(double a, double b) {
+        return (int) (Math.floor(a / b) * b);
     }
 }

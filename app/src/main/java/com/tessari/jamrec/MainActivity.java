@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
-        bufferSize = 1024;// AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding)
+        bufferSize = 1024;// AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
 //        startUIupdateThread(16);
     }
