@@ -40,9 +40,9 @@
             android:id="@+id/audioCanvas"
             android:layout_width="0dp"
             android:layout_height="200dp"
-            android:layout_marginBottom="4dp"
-            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintBottom_toTopOf="@+id/timebar"
             drawable:layout_constraintEnd_toEndOf="parent"
+            drawable:layout_constraintHorizontal_bias="1.0"
             drawable:layout_constraintStart_toStartOf="parent">
 
             <!--<LinearLayout-->
@@ -50,6 +50,14 @@
             <!--android:layout_height="wrap_content"-->
             <!--android:orientation="vertical" />-->
         </com.tessari.jamrec.AudioCanvas>
+
+        <com.tessari.jamrec.Timebar
+            android:id="@+id/timebar"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintEnd_toEndOf="parent"
+            drawable:layout_constraintStart_toStartOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout

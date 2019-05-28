@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="Background">#1F161A</color>
-    <color name="SecondBackground">#595A4A</color>
+    <color name="SecondBackground">#463535</color>
     <color name="Text">#DBCDC6</color>
     <color name="MainForeground">#DBCDC6</color>
     <color name="MainForegroundPressed">#8F8581</color>

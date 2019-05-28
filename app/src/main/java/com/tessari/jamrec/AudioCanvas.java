@@ -23,15 +23,13 @@ public class AudioCanvas extends View {
     private GestureDetector scrollDetector;
     private Paint wavesColor, controlBarColor, blue;
     private Track track = null;
-    private int offset = 0, precSize = 0, valMax = 100;
-    int trackViewWidth;
+    private SessionManager session = null;
+    private int precSize = 0, valMax = 100;
 
     boolean autoMove = true;
 
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
-        stretchDetector = new ScaleGestureDetector(c, new StretchListener());
-        scrollDetector = new GestureDetector(c, new ScrollListener());
         wavesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
         wavesColor.setStyle(Paint.Style.FILL);
@@ -41,37 +39,32 @@ public class AudioCanvas extends View {
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
         blue.setColor(Color.BLUE);
         blue.setStyle(Paint.Style.FILL);
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                trackViewWidth = getWidth() * 300;
-                offset = trackViewWidth / 2;
-            }
-        });
     }
 
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
-        int height = getHeight();
-        int width = getWidth();
-        int size = track == null ? 0 : track.size();
+        if (session != null) {
+            int height = getHeight();
+            int width = getWidth();
+            int size = track == null ? 0 : track.size();
 
-        // se la recBar supera il 75% della schermata attiva l'automove
-        if (size > fromViewIndexToSamplesIndex((int) (width * 0.75)) && autoMove)
-            sumOffsetNotRel(size - precSize);
+            // se la recBar supera il 75% della schermata attiva l'automove
+            if (size > fromViewIndexToSamplesIndex((int) (width * 0.75)) && autoMove)
+                session.sumOffsetNotRel(size - precSize);
 
-        for (int i = 0; i < width; i++) {
-            float val = readNormalized(i);
-            c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesColor);
+            for (int i = 0; i < width; i++) {
+                float val = readNormalized(i);
+                c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesColor);
+            }
+
+            // disegna la recBar
+            drawLineRelative(c, controlBarColor, size, height - height / 4f, height / 4f);
+
+            // disegna la playBar
+            drawLineRelative(c, blue, track.getPlayerBufferPos(), height, 0);
+            precSize = size;
         }
-
-        // disegna la recBar
-        drawLineRelative(c, controlBarColor, size, height - height / 4f, height / 4f);
-
-        // disegna la playBar
-        drawLineRelative(c, blue, track.getPlayerBufferPos(), height, 0);
-        precSize = size;
     }
 
     /**
@@ -91,6 +84,7 @@ public class AudioCanvas extends View {
     /**
      * legge il valore della trackVisualization e lo normalizza
      * in base al picco corrente
+     *
      * @param index
      * @return
      */
@@ -106,6 +100,9 @@ public class AudioCanvas extends View {
     }
 
     private int fromViewIndexToSamplesIndex(int i) {
+        int trackViewWidth = session.getTrackViewWidth();
+        int offset = session.getOffset();
+
         // il rapporto dev'essere approssimato per difetto
         int widthRatio = floorDiv(trackViewWidth, getWidth());
 
@@ -123,61 +120,36 @@ public class AudioCanvas extends View {
     }
 
     private int fromSamplesIndexToViewIndex(int i) {
-        double start1 = offset - trackViewWidth / 2f;
-        return (int) (((i - start1) / trackViewWidth) * getWidth());
+        double start1 = session.getOffset() - session.getTrackViewWidth() / 2f;
+        return (int) (((i - start1) / session.getTrackViewWidth()) * getWidth());
     }
 
     private float fromSamplesIndexToViewIndexFloat(float i) {
-        float tvw = trackViewWidth;
+        float tvw = session.getTrackViewWidth();
         float width = (float) this.getWidth();
-        float start1 = offset - tvw / 2f;
+        float start1 = session.getOffset() - tvw / 2f;
         return ((i - start1) / tvw) * width;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        scrollDetector.onTouchEvent(e);
-        stretchDetector.onTouchEvent(e);
-        return true;
-    }
-
-    private void sumStretch(double x) {
-        if (trackViewWidth - x < getWidth())
-            trackViewWidth = getWidth();
-        else
-            trackViewWidth -= x;
-    }
-
-    private void sumOffset(int x) {
-        offset += x * (trackViewWidth / getWidth());
-    }
-
-    private void sumOffsetNotRel(int x) {
-        offset += x;
+        if (scrollDetector != null && stretchDetector != null) {
+            scrollDetector.onTouchEvent(e);
+            stretchDetector.onTouchEvent(e);
+            return true;
+        } else
+            return false;
     }
 
     public void setTrack(Track t) {
         track = t;
     }
 
-    private class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            double f = scaleGestureDetector.getScaleFactor() - 1;
-            sumStretch(f * trackViewWidth * 2);
-            return true;
-        }
+    public void setSession(SessionManager session) {
+        this.session = session;
+        stretchDetector = new ScaleGestureDetector(this.getContext(), session.new StretchListener());
+        scrollDetector = new GestureDetector(this.getContext(), session.new ScrollListener());
     }
-
-    private class ScrollListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-            sumOffset((int) v);
-            invalidate();
-            return true;
-        }
-    }
-
 
     // Funzione di Math non presente nella min API
     private static int floorDiv(int a, int b) {

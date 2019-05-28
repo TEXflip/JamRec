@@ -1,29 +1,45 @@
 package com.tessari.jamrec;
 
 import android.support.v7.app.AppCompatActivity;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.widget.ToggleButton;
 
 class SessionManager {
     private AppCompatActivity context;
     private AudioCanvas audioCanvas;
+    private Timebar timebar;
     private ToggleButton button_rec, button_play;
     Track track;
     private Recorder recorder;
     private int bufferSize = 1024;
+    private int offset = 0, trackViewWidth;
 
-    SessionManager(AppCompatActivity context, int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out, AudioCanvas canvas) {
+    SessionManager(AppCompatActivity context, int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
         this.context = context;
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
-        audioCanvas = canvas;
+        this.audioCanvas = context.findViewById(R.id.audioCanvas);
+        this.timebar = context.findViewById(R.id.timebar);
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
         audioCanvas.setTrack(track);
+        audioCanvas.setSession(this);
+        timebar.setSession(this);
         this.bufferSize = bufferSize;
+        audioCanvas.post(new Runnable() {
+            @Override
+            public void run() {
+                trackViewWidth = audioCanvas.getWidth() * 300;
+                offset = trackViewWidth / 2 - 2000;
+            }
+        });
     }
 
     void updateCanvas() {
         audioCanvas.invalidate();
+        timebar.invalidate();
     }
 
     void startRec() {
@@ -62,5 +78,47 @@ class SessionManager {
 
     boolean isPlaying() {
         return track.isPlaying();
+    }
+
+    int getOffset(){
+        return offset;
+    }
+
+    int getTrackViewWidth(){
+        return trackViewWidth;
+    }
+
+    void sumTrackViewWidth(double x) {
+        if (trackViewWidth - x < audioCanvas.getWidth())
+            trackViewWidth = audioCanvas.getWidth();
+        else
+            trackViewWidth -= x;
+    }
+
+    void sumOffset(int x) {
+        offset += x * (trackViewWidth / audioCanvas.getWidth());
+    }
+
+    void sumOffsetNotRel(int x) {
+        offset += x;
+    }
+
+    class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+            double f = scaleGestureDetector.getScaleFactor() - 1;
+            sumTrackViewWidth(f * trackViewWidth * 2);
+            updateCanvas();
+            return true;
+        }
+    }
+
+    class ScrollListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            sumOffset((int) v);
+            updateCanvas();
+            return true;
+        }
     }
 }

@@ -13,7 +13,7 @@ class Recorder {
 
     Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, SessionManager session) {
         recorder = new AudioRecord.Builder()
-                .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                .setAudioSource(MediaRecorder.AudioSource.DEFAULT)
                 .setAudioFormat(new AudioFormat.Builder()
                         .setEncoding(audio_encoding)
                         .setSampleRate(sampleRate)
