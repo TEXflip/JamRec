@@ -51,6 +51,10 @@ class SessionManager {
         });
     }
 
+    void restartPlay(){
+        track.resetPlay();
+        updateCanvas();
+    }
 
     boolean isRecording() {
         return recorder.isRecording();

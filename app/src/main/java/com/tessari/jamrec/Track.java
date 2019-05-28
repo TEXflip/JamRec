@@ -42,6 +42,11 @@ class Track {
         playerThread = null;
     }
 
+    void resetPlay(){
+        if(isPlaying) session.pausePlay();
+        playerBufferPos = 0;
+    }
+
     boolean isPlaying() {
         return isPlaying;
     }
@@ -80,7 +85,7 @@ class Track {
     }
 
     int getPlayerBufferPos() {
-        return playerBufferPos*bufferSize;
+        return playerBufferPos * bufferSize;
     }
 
     int size() {

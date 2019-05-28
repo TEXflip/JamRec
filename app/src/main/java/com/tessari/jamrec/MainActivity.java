@@ -20,7 +20,6 @@ import android.widget.ToggleButton;
 public class MainActivity extends AppCompatActivity {
     AudioCanvas canvas;
     SessionManager session;
-    Track track;
     int bufferSize = 1024, sampleRate = 44100, audio_encoding = AudioFormat.ENCODING_PCM_16BIT, audio_channel_in = AudioFormat.CHANNEL_IN_STEREO, audio_channel_out = AudioFormat.CHANNEL_OUT_STEREO;
 
 
@@ -31,26 +30,9 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 
-        canvas = (AudioCanvas) findViewById(R.id.audioCanvas);
-//        ((SeekBar)findViewById(R.id.test_bar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//               // canvas.stretch = i;
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
+        canvas = findViewById(R.id.audioCanvas);
         bufferSize = 1024;// AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out, canvas);
-//        startUIupdateThread(16);
     }
 
 
@@ -66,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
             session.startPlay();
         else
             session.pausePlay();
+    }
+
+    public void restartButtonOnClick(View v){
+        session.restartPlay();
     }
 
     private void startUIupdateThread(final int millis) {

@@ -141,7 +141,7 @@ public class AudioCanvas extends View {
         return true;
     }
 
-    private void sumStretch(float x) {
+    private void sumStretch(double x) {
         if (trackViewWidth - x < getWidth())
             trackViewWidth = getWidth();
         else
@@ -163,7 +163,7 @@ public class AudioCanvas extends View {
     private class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            float f = scaleGestureDetector.getScaleFactor() - 1;
+            double f = scaleGestureDetector.getScaleFactor() - 1;
             sumStretch(f * trackViewWidth * 2);
             return true;
         }
