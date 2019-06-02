@@ -3,16 +3,18 @@ package com.tessari.jamrec;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 class Recorder {
     private AudioRecord recorder;
+    private MediaRecorder redorder2;
     private SessionManager session;
     private boolean isRecording = false;
     private Thread recordingThread;
     private int bufferSize;
 
     Recorder(int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, SessionManager session) {
-        recorder = new AudioRecord.Builder()
+        /*recorder = new AudioRecord.Builder()
                 .setAudioSource(MediaRecorder.AudioSource.DEFAULT)
                 .setAudioFormat(new AudioFormat.Builder()
                         .setEncoding(audio_encoding)
@@ -20,7 +22,15 @@ class Recorder {
                         .setChannelMask(audio_channel_in)
                         .build())
                 .setBufferSizeInBytes(bufferSize)
-                .build();
+                .build();*/
+        /*redorder2 = new MediaRecorder();
+        redorder2.setAudioChannels(1);
+        redorder2.setAudioEncoder(audio_encoding);
+        redorder2.setAudioSamplingRate(sampleRate);
+        redorder2.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        redorder2.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        redorder2.set*/
+        recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT,sampleRate,audio_channel_in,audio_encoding,bufferSize);
         this.session = session;
         this.bufferSize = bufferSize;
     }
@@ -30,6 +40,7 @@ class Recorder {
         recordingThread = new RecordingThread();
         recorder.startRecording();
         recordingThread.start();
+        session.millis = System.currentTimeMillis();
     }
 
     void stop() {

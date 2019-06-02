@@ -13,15 +13,17 @@ class SessionManager {
     private ToggleButton button_rec, button_play;
     Track track;
     private Recorder recorder;
-    private int bufferSize = 1024;
+    private int bufferSize = 1024, sampleRate = 44100;
     private int offset = 0, trackViewWidth;
+    public long millis = 0;
 
-    SessionManager(AppCompatActivity context, int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
+    SessionManager(AppCompatActivity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
         this.context = context;
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
         this.audioCanvas = context.findViewById(R.id.audioCanvas);
         this.timebar = context.findViewById(R.id.timebar);
+        this.sampleRate = sampleRate;
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
         audioCanvas.setTrack(track);
@@ -31,14 +33,17 @@ class SessionManager {
         audioCanvas.post(new Runnable() {
             @Override
             public void run() {
-                trackViewWidth = audioCanvas.getWidth() * 300;
-                offset = trackViewWidth / 2 - 2000;
+                trackViewWidth = sampleRate * 10;
+                offset = trackViewWidth / 2 - sampleRate/10;
             }
         });
     }
 
     void updateCanvas() {
         audioCanvas.invalidate();
+    }
+
+    void updateTimebar() {
         timebar.invalidate();
     }
 
@@ -67,7 +72,7 @@ class SessionManager {
         });
     }
 
-    void restartPlay(){
+    void restartPlay() {
         track.resetPlay();
         updateCanvas();
     }
@@ -80,12 +85,16 @@ class SessionManager {
         return track.isPlaying();
     }
 
-    int getOffset(){
+    int getOffset() {
         return offset;
     }
 
-    int getTrackViewWidth(){
+    int getTrackViewWidth() {
         return trackViewWidth;
+    }
+
+    int getSampleRate(){
+        return sampleRate;
     }
 
     void sumTrackViewWidth(double x) {
@@ -93,14 +102,18 @@ class SessionManager {
             trackViewWidth = audioCanvas.getWidth();
         else
             trackViewWidth -= x;
+        updateCanvas();
+        updateTimebar();
     }
 
     void sumOffset(int x) {
-        offset += x * (trackViewWidth / audioCanvas.getWidth());
+        sumOffsetNotRel(x * (trackViewWidth / audioCanvas.getWidth()));
     }
 
     void sumOffsetNotRel(int x) {
         offset += x;
+        updateTimebar();
+        updateCanvas();
     }
 
     class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -108,7 +121,6 @@ class SessionManager {
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
             double f = scaleGestureDetector.getScaleFactor() - 1;
             sumTrackViewWidth(f * trackViewWidth * 2);
-            updateCanvas();
             return true;
         }
     }
@@ -117,7 +129,6 @@ class SessionManager {
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
             sumOffset((int) v);
-            updateCanvas();
             return true;
         }
     }

@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class Timebar extends View {
-    private Paint linesColor,textColor;
+    private Paint linesColor, textColor;
     private SessionManager session;
 
     public Timebar(Context context, AttributeSet set) {
@@ -24,23 +24,26 @@ public class Timebar extends View {
 
     @Override
     protected void onDraw(Canvas c) {
-        int width = this.getWidth(), height = this.getHeight();
+        if(session != null) {
+            int width = this.getWidth(), height = this.getHeight();
 //        c.drawLine(0, 0, width, 0, linesColor);
-        c.drawRect(0, 0, width, 4, linesColor);
+            c.drawRect(0, 0, width, 4, linesColor);
 
-        int widthRatio = session.getTrackViewWidth() / width;
-        int oneSec = 44100 / widthRatio;
-        int offset = fromSamplesIndexToViewIndex(0);
+//        int widthRatio = session.getTrackViewWidth() / width;
+//        int nSec = session.getTrackViewWidth() / 44100;
+//        int offset = fromSamplesIndexToViewIndex(0);
 
-        for (int i = 0; i < width / oneSec; i++) {
-            c.drawRect(offset + i * oneSec -2, 0, offset + i * oneSec + 2, 35, linesColor);
-            c.drawText(String.valueOf(i),offset + i * oneSec, 60, textColor);
+            for (int i = 0; i < 61; i++) {
+                int posX = fromSamplesIndexToViewIndex(i * session.getSampleRate());
+                c.drawRect(posX - 2, 0, posX + 2, 35, linesColor);
+                c.drawText(String.valueOf(i), posX, 60, textColor);
+            }
         }
     }
 
     private int fromSamplesIndexToViewIndex(int i) {
         double start1 = session.getOffset() - session.getTrackViewWidth() / 2f;
-        return (int) (((i - start1) / session.getTrackViewWidth()) * getWidth());
+        return (int) Math.floor((((double)i - start1) / (double) session.getTrackViewWidth()) * getWidth());
     }
 
     public void setSession(SessionManager session) {

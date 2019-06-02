@@ -2,6 +2,7 @@ package com.tessari.jamrec;
 
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
 import java.util.Vector;
 
@@ -12,8 +13,7 @@ class Track {
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
-    private float bufferDividerFactor = 1; // numero di campioni compressi in uno per la traccia di visualizzazione
-    private int bufferDivider, bufferSize, playerBufferPos = 0;
+    private int bufferSize, playerBufferPos = 0;
     private boolean isPlaying = false;
 
     Track(int sampleRate, int bufferSize, int audio_encoding,
@@ -22,7 +22,6 @@ class Track {
         trackSamples = new Vector<>();
         this.bufferSize = bufferSize;
         this.session = session;
-        this.bufferDivider = (int) (bufferSize / bufferDividerFactor);
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
                 audio_channel_out,
                 audio_encoding, bufferSize,
@@ -42,8 +41,8 @@ class Track {
         playerThread = null;
     }
 
-    void resetPlay(){
-        if(isPlaying) session.pausePlay();
+    void resetPlay() {
+        if (isPlaying) session.pausePlay();
         playerBufferPos = 0;
     }
 
@@ -53,11 +52,11 @@ class Track {
 
     void write(short[] elem) {
         trackSamples.add(elem);
-        for (int a = 0; a < bufferDivider; a++) {
-            int average = 0;
-            for (int i = 0; i < (elem.length / bufferDivider) * a; i++)
-                average += elem[i];
-            trackVisualization.add((short) (average / elem.length));
+        for (int a = 0; a < elem.length; a++) {
+            trackVisualization.add(elem[a]);
+            long time=System.currentTimeMillis()-session.millis;
+//            if( time>998 && time<1002)
+//                Log.e("timeeeeee", ""+trackVisualization.size());
         }
     }
 
