@@ -1,26 +1,22 @@
 package com.tessari.jamrec;
 
 import android.content.Context;
-import android.gesture.GestureLibrary;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewTreeObserver;
+
+import com.tessari.jamrec.Utils.SupportMath;
 
 public class AudioCanvas extends View {
 
-    private ScaleGestureDetector stretchDetector;
-    private GestureDetector scrollDetector;
+
     private Paint wavesColor, controlBarColor, blue;
     private Track track = null;
     private SessionManager session = null;
@@ -104,11 +100,11 @@ public class AudioCanvas extends View {
         int offset = session.getOffset();
 
         // il rapporto dev'essere approssimato per difetto
-        int widthRatio = floorDiv(trackViewWidth, getWidth());
+        int widthRatio = SupportMath.floorDiv(trackViewWidth, getWidth());
 
         // viene preso il valore dell'offset piú vicino ad un multiplo del widthRatio
         // per mantenere gli stessi valori durante lo slide della traccia
-        int offsetMod = floorMod(offset, widthRatio);
+        int offsetMod = SupportMath.floorMod(offset, widthRatio);
 
         // centro l'offset per avere uno zoom centrale durante la ScaleGesture
         int start2 = (offsetMod - trackViewWidth / 2);
@@ -133,12 +129,8 @@ public class AudioCanvas extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        if (scrollDetector != null && stretchDetector != null) {
-            scrollDetector.onTouchEvent(e);
-            stretchDetector.onTouchEvent(e);
-            return true;
-        } else
-            return false;
+        session.onTouchEvent(e);
+        return true;
     }
 
     public void setTrack(Track t) {
@@ -147,20 +139,6 @@ public class AudioCanvas extends View {
 
     public void setSession(SessionManager session) {
         this.session = session;
-        stretchDetector = new ScaleGestureDetector(this.getContext(), session.new StretchListener());
-        scrollDetector = new GestureDetector(this.getContext(), session.new ScrollListener());
     }
 
-    // Funzione di Math non presente nella min API
-    private static int floorDiv(int a, int b) {
-        int r = a / b;
-        if ((a ^ b) < 0 && (r * b != a))
-            r--;
-        return r;
-    }
-
-    // Funzione di Math non presente nella min API
-    private static int floorMod(double a, double b) {
-        return (int) (Math.floor(a / b) * b);
-    }
 }

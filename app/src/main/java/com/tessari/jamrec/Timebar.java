@@ -5,7 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+
+import com.tessari.jamrec.Utils.SupportMath;
 
 public class Timebar extends View {
     private Paint linesColor, textColor;
@@ -29,11 +32,12 @@ public class Timebar extends View {
 //        c.drawLine(0, 0, width, 0, linesColor);
             c.drawRect(0, 0, width, 4, linesColor);
 
-//        int widthRatio = session.getTrackViewWidth() / width;
-//        int nSec = session.getTrackViewWidth() / 44100;
-//        int offset = fromSamplesIndexToViewIndex(0);
+            int firstSec = SupportMath.floorDiv(session.getOffsetAt0(),session.getSampleRate()); // il secondo che si trova piú a sinistra della view
+            int viewWidthInSec = SupportMath.floorDiv(session.getTrackViewWidth(),session.getSampleRate()); // lunghezza in secondi della view
 
-            for (int i = 0; i < 61; i++) {
+
+
+            for (int i = firstSec; i <= firstSec + viewWidthInSec + 1; i++) {
                 int posX = fromSamplesIndexToViewIndex(i * session.getSampleRate());
                 c.drawRect(posX - 2, 0, posX + 2, 35, linesColor);
                 c.drawText(String.valueOf(i), posX, 60, textColor);

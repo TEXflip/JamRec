@@ -3,13 +3,15 @@ package com.tessari.jamrec;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ScrollView;
 
 public class MainActivity extends AppCompatActivity {
     SessionManager session;
@@ -24,6 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
         bufferSize = 1024; // AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out);
+
+        ((ScrollView)findViewById(R.id.track_list)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                session.onTouchEvent(motionEvent);
+                view.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
     }
 
     public void recButtonOnClick(View v) {

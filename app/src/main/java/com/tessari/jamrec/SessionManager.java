@@ -7,8 +7,12 @@ import android.view.ScaleGestureDetector;
 import android.widget.ToggleButton;
 
 class SessionManager {
+
+    ScaleGestureDetector stretchDetector;
+    GestureDetector scrollDetector;
+
     private AppCompatActivity context;
-    private AudioCanvas audioCanvas;
+    public AudioCanvas audioCanvas;
     private Timebar timebar;
     private ToggleButton button_rec, button_play;
     Track track;
@@ -24,6 +28,10 @@ class SessionManager {
         this.audioCanvas = context.findViewById(R.id.audioCanvas);
         this.timebar = context.findViewById(R.id.timebar);
         this.sampleRate = sampleRate;
+
+        stretchDetector = new ScaleGestureDetector(context,new StretchListener());
+        scrollDetector = new GestureDetector(context,new ScrollListener());
+
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
         audioCanvas.setTrack(track);
@@ -89,6 +97,10 @@ class SessionManager {
         return offset;
     }
 
+    int getOffsetAt0() {
+        return offset - trackViewWidth/2;
+    }
+
     int getTrackViewWidth() {
         return trackViewWidth;
     }
@@ -114,6 +126,11 @@ class SessionManager {
         offset += x;
         updateTimebar();
         updateCanvas();
+    }
+
+    void onTouchEvent(MotionEvent e){
+        scrollDetector.onTouchEvent(e);
+        stretchDetector.onTouchEvent(e);
     }
 
     class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
