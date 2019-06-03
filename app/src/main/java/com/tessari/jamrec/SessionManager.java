@@ -1,6 +1,7 @@
 package com.tessari.jamrec;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -11,7 +12,7 @@ import com.tessari.jamrec.Utils.SupportMath;
 class SessionManager {
 
     private ScaleGestureDetector stretchDetector;
-    private GestureDetector scrollDetector;
+    private GestureDetector scrollDetector, timebarScrollDetector;
 
     private AppCompatActivity context;
     private AudioCanvas audioCanvas;
@@ -31,8 +32,9 @@ class SessionManager {
         this.timebar = context.findViewById(R.id.timebar);
         this.sampleRate = sampleRate;
 
-        stretchDetector = new ScaleGestureDetector(context, new StretchListener());
-        scrollDetector = new GestureDetector(context, new ScrollListener());
+        stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
+        scrollDetector = new GestureDetector(context, new ViewScrollListener());
+        timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());
 
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
@@ -43,7 +45,7 @@ class SessionManager {
         audioCanvas.post(new Runnable() {
             @Override
             public void run() {
-                trackViewWidth = sampleRate * 10;
+                trackViewWidth = sampleRate * 15;
                 offset = trackViewWidth / 2 - sampleRate / 10;
             }
         });
@@ -51,6 +53,7 @@ class SessionManager {
 
     void updateCanvas() {
         audioCanvas.invalidate();
+        timebar.invalidate();
     }
 
     void updateTimebar() {
@@ -111,6 +114,14 @@ class SessionManager {
         return sampleRate;
     }
 
+    int getPlayBarPos(){
+        return track.getPlayerBufferPos();
+    }
+
+    void sumPlayBarPos(int x){
+        track.setPlayerBufferPos(track.getPlayerBufferPos()+x*(trackViewWidth / audioCanvas.getWidth()));
+    }
+
     /**
      * allarga o diminuisce la dimensione della trackViewWidth
      * min = viewWidth, max = Integer.MAX
@@ -122,7 +133,6 @@ class SessionManager {
         else
             trackViewWidth -= x;
         updateCanvas();
-        updateTimebar();
     }
 
     void sumOffset(int x) {
@@ -131,7 +141,6 @@ class SessionManager {
 
     void sumOffsetNotRel(int x) {
         offset += x;
-        updateTimebar();
         updateCanvas();
     }
 
@@ -148,7 +157,7 @@ class SessionManager {
 
         // quando é molto zoommato l'approssimazione del widthRatio rende lo zoom scattoso, in questo modo si aggira il problema
         float retWidthRatio = widthRatio <= 18 ? ((float) trackViewWidth / (float) width) : widthRatio;
-
+//        retWidthRatio = ((float) trackViewWidth / (float) width);
         return start2 + (int) (i * retWidthRatio);
     }
 
@@ -157,12 +166,16 @@ class SessionManager {
         return (int) (((i - start1) / trackViewWidth) * width);
     }
 
-    void onTouchEvent(MotionEvent e) {
+    void onTouchViewEvent(MotionEvent e) {
         scrollDetector.onTouchEvent(e);
         stretchDetector.onTouchEvent(e);
     }
 
-    class StretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+    void onTouchTimebarEvent(MotionEvent e){
+        timebarScrollDetector.onTouchEvent(e);
+    }
+
+    class ViewStretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
             double f = scaleGestureDetector.getScaleFactor() - 1;
@@ -171,10 +184,20 @@ class SessionManager {
         }
     }
 
-    class ScrollListener extends GestureDetector.SimpleOnGestureListener {
+    class ViewScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
             sumOffset((int) v);
+            return true;
+        }
+    }
+
+    class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            sumPlayBarPos((int)v);
+            updateCanvas();
+            Log.e("VVVVVVVVVVV", ""+v );
             return true;
         }
     }

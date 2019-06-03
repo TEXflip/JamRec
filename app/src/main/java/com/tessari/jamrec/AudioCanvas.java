@@ -19,7 +19,7 @@ public class AudioCanvas extends View {
     private SessionManager session = null;
     private int precSize = 0, valMax = 100;
     boolean autoMove = true;
-    private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60*2, 60*5, 60*10, 60*20, 60*60, 60*60*2, 60*60*5, 60*60*10, 60*60*20, 60*60*24};
+    private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 20, 60 * 60, 60 * 60 * 2, 60 * 60 * 5, 60 * 60 * 10, 60 * 60 * 20, 60 * 60 * 24};
 
 
     public AudioCanvas(Context c, AttributeSet set) {
@@ -30,9 +30,11 @@ public class AudioCanvas extends View {
         controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         controlBarColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
         controlBarColor.setStyle(Paint.Style.FILL);
+        controlBarColor.setStrokeWidth(4);
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
         blue.setColor(Color.BLUE);
         blue.setStyle(Paint.Style.FILL);
+        blue.setStrokeWidth(4);
         linesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         linesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
         linesColor.setStyle(Paint.Style.FILL);
@@ -57,18 +59,20 @@ public class AudioCanvas extends View {
             }
 
             // disegna la recBar
-            drawLineRelative(c, controlBarColor, size, height, 0);
+            int CBpos = session.fromSamplesIndexToViewIndex(size, width);
+            c.drawLine(CBpos, height, CBpos, 0, controlBarColor);
 
             // disegna la playBar
-            drawLineRelative(c, blue, track.getPlayerBufferPos(), height, 0);
+            int PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
+            c.drawLine(PBpos, height, PBpos, 0, blue);
             precSize = size;
 
         }
     }
 
-    private void drawTimeLines(Canvas c){
-        double firstSec = session.getOffsetAt0()/(double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view
-        float viewWidthInSec = session.getTrackViewWidth() / (float)session.getSampleRate(); // lunghezza in secondi della view
+    private void drawTimeLines(Canvas c) {
+        double firstSec = session.getOffsetAt0() / (double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view
+        float viewWidthInSec = session.getTrackViewWidth() / (float) session.getSampleRate(); // lunghezza in secondi della view
 
         float reduxFactor = ((float) session.getTrackViewWidth() / (float) (session.getSampleRate() * 10));
 //            float reduxFactor = ((float) session.getTrackViewWidth() / (float) (width*400));
@@ -81,8 +85,8 @@ public class AudioCanvas extends View {
         firstSec = SupportMath.floorModD(firstSec, reduxFactor);
 //            Log.e("AAAAA", "firstSec: "+firstSec+" rf: "+reduxFactor );
         for (double i = firstSec; i <= firstSec + viewWidthInSec + reduxFactor; i += reduxFactor) {
-            int posX = session.fromSamplesIndexToViewIndex((int)(i * session.getSampleRate()), getWidth());
-            int posXhalf = session.fromSamplesIndexToViewIndex((int)((i+reduxFactor/2) * session.getSampleRate()), getWidth());
+            int posX = session.fromSamplesIndexToViewIndex((int) (i * session.getSampleRate()), getWidth());
+            int posXhalf = session.fromSamplesIndexToViewIndex((int) ((i + reduxFactor / 2) * session.getSampleRate()), getWidth());
             c.drawRect(posX - 1.5f, 0, posX + 1.5f, getHeight(), linesColor);
             c.drawRect(posXhalf - 0.5f, 0, posXhalf + 0.5f, getHeight(), linesColor);
         }
@@ -122,7 +126,7 @@ public class AudioCanvas extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        session.onTouchEvent(e);
+        session.onTouchViewEvent(e);
         return true;
     }
 

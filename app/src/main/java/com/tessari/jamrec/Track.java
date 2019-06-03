@@ -54,7 +54,7 @@ class Track {
         trackSamples.add(elem);
         for (int a = 0; a < elem.length; a++) {
             trackVisualization.add(elem[a]);
-            long time=System.currentTimeMillis()-session.millis;
+            long time = System.currentTimeMillis() - session.millis;
 //            if( time>998 && time<1002)
 //                Log.e("timeeeeee", ""+trackVisualization.size());
         }
@@ -85,6 +85,15 @@ class Track {
 
     int getPlayerBufferPos() {
         return playerBufferPos * bufferSize;
+    }
+
+    void setPlayerBufferPos(int x) {
+        if (x > trackSamples.size())
+            playerBufferPos = trackSamples.size() - 1;
+        else if(x < 0)
+            playerBufferPos = 0;
+        else
+            playerBufferPos = x;
     }
 
     int size() {

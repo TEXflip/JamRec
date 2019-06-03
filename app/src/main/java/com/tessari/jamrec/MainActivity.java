@@ -7,8 +7,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
@@ -30,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         ((ScrollView)findViewById(R.id.track_list)).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                session.onTouchEvent(motionEvent);
+                session.onTouchViewEvent(motionEvent);
                 view.onTouchEvent(motionEvent);
                 return true;
             }

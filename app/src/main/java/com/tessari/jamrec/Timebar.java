@@ -2,16 +2,18 @@ package com.tessari.jamrec;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.tessari.jamrec.Utils.SupportMath;
 
 public class Timebar extends View {
-    private Paint linesColor, textColor;
+    private Paint linesColor, textColor, blue;
     private SessionManager session;
     private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60*2, 60*5, 60*10, 60*20, 60*60, 60*60*2, 60*60*5, 60*60*10, 60*60*20, 60*60*24};
 
@@ -24,6 +26,10 @@ public class Timebar extends View {
         textColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForegroundPressed, null));
         textColor.setTextSize(30);
         textColor.setTextAlign(Paint.Align.CENTER);
+        blue = new Paint(Paint.ANTI_ALIAS_FLAG);
+        blue.setColor(Color.BLUE);
+        blue.setAlpha(150);
+        blue.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -32,6 +38,8 @@ public class Timebar extends View {
             int width = this.getWidth(), height = this.getHeight();
 //        c.drawLine(0, 0, width, 0, linesColor);
             c.drawRect(0, 0, width, 4, linesColor);
+
+
 
             double firstSec = session.getOffsetAt0()/(double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view
             float viewWidthInSec = session.getTrackViewWidth() / (float)session.getSampleRate(); // lunghezza in secondi della view
@@ -53,7 +61,16 @@ public class Timebar extends View {
                 c.drawRect(posXhalf - 1.5f, 0, posXhalf + 1.5f, 13, linesColor);
                 c.drawText(toTime(i, (int)reduxFactor), posX, 60, textColor);
             }
+
+            float PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
+            c.drawRoundRect(PBpos-30, 0, PBpos+30, height,25,25, blue);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        session.onTouchTimebarEvent(e);
+        return true;
     }
 
     private String toTime(double sec, int rf) {
