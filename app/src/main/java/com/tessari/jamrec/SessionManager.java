@@ -6,13 +6,15 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.ToggleButton;
 
+import com.tessari.jamrec.Utils.SupportMath;
+
 class SessionManager {
 
-    ScaleGestureDetector stretchDetector;
-    GestureDetector scrollDetector;
+    private ScaleGestureDetector stretchDetector;
+    private GestureDetector scrollDetector;
 
     private AppCompatActivity context;
-    public AudioCanvas audioCanvas;
+    private AudioCanvas audioCanvas;
     private Timebar timebar;
     private ToggleButton button_rec, button_play;
     Track track;
@@ -29,8 +31,8 @@ class SessionManager {
         this.timebar = context.findViewById(R.id.timebar);
         this.sampleRate = sampleRate;
 
-        stretchDetector = new ScaleGestureDetector(context,new StretchListener());
-        scrollDetector = new GestureDetector(context,new ScrollListener());
+        stretchDetector = new ScaleGestureDetector(context, new StretchListener());
+        scrollDetector = new GestureDetector(context, new ScrollListener());
 
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
@@ -42,7 +44,7 @@ class SessionManager {
             @Override
             public void run() {
                 trackViewWidth = sampleRate * 10;
-                offset = trackViewWidth / 2 - sampleRate/10;
+                offset = trackViewWidth / 2 - sampleRate / 10;
             }
         });
     }
@@ -98,17 +100,22 @@ class SessionManager {
     }
 
     int getOffsetAt0() {
-        return offset - trackViewWidth/2;
+        return offset - trackViewWidth / 2;
     }
 
     int getTrackViewWidth() {
         return trackViewWidth;
     }
 
-    int getSampleRate(){
+    int getSampleRate() {
         return sampleRate;
     }
 
+    /**
+     * allarga o diminuisce la dimensione della trackViewWidth
+     * min = viewWidth, max = Integer.MAX
+     * @param x quantitá di zoom
+     */
     void sumTrackViewWidth(double x) {
         if (trackViewWidth - x < audioCanvas.getWidth())
             trackViewWidth = audioCanvas.getWidth();
@@ -128,7 +135,29 @@ class SessionManager {
         updateCanvas();
     }
 
-    void onTouchEvent(MotionEvent e){
+    int fromViewIndexToSamplesIndex(int i, int width) {
+        // il rapporto dev'essere approssimato per difetto
+        int widthRatio = SupportMath.floorDiv(trackViewWidth, width);
+
+        // viene preso il valore dell'offset piú vicino ad un multiplo del widthRatio
+        // per mantenere gli stessi valori durante lo slide della traccia
+        int offsetMod = SupportMath.floorMod(offset, widthRatio);
+
+        // centro l'offset per avere uno zoom centrale durante la ScaleGesture
+        int start2 = (offsetMod - trackViewWidth / 2);
+
+        // quando é molto zoommato l'approssimazione del widthRatio rende lo zoom scattoso, in questo modo si aggira il problema
+        float retWidthRatio = widthRatio <= 18 ? ((float) trackViewWidth / (float) width) : widthRatio;
+
+        return start2 + (int) (i * retWidthRatio);
+    }
+
+    int fromSamplesIndexToViewIndex(int i,int width) {
+        double start1 = offset - trackViewWidth / 2f;
+        return (int) (((i - start1) / trackViewWidth) * width);
+    }
+
+    void onTouchEvent(MotionEvent e) {
         scrollDetector.onTouchEvent(e);
         stretchDetector.onTouchEvent(e);
     }

@@ -15,4 +15,10 @@ public class SupportMath {
     public static int floorMod(double a, double b) {
         return (int) (Math.floor(a / b) * b);
     }
+
+    public static double floorModD(double a, double b) {
+        return (Math.floor(a / b) * b);
+    }
+
+
 }

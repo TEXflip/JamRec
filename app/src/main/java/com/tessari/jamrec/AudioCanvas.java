@@ -6,10 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.tessari.jamrec.Utils.SupportMath;
@@ -17,12 +14,13 @@ import com.tessari.jamrec.Utils.SupportMath;
 public class AudioCanvas extends View {
 
 
-    private Paint wavesColor, controlBarColor, blue;
+    private Paint wavesColor, controlBarColor, blue, linesColor;
     private Track track = null;
     private SessionManager session = null;
     private int precSize = 0, valMax = 100;
-
     boolean autoMove = true;
+    private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60*2, 60*5, 60*10, 60*20, 60*60, 60*60*2, 60*60*5, 60*60*10, 60*60*20, 60*60*24};
+
 
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
@@ -35,18 +33,22 @@ public class AudioCanvas extends View {
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
         blue.setColor(Color.BLUE);
         blue.setStyle(Paint.Style.FILL);
+        linesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+        linesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
+        linesColor.setStyle(Paint.Style.FILL);
     }
 
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (session != null) {
+            drawTimeLines(c);
             int height = getHeight();
             int width = getWidth();
             int size = track == null ? 0 : track.size();
 
             // se la recBar supera il 75% della schermata attiva l'automove
-            if (size > fromViewIndexToSamplesIndex((int) (width * 0.75)) && autoMove)
+            if (size > session.fromViewIndexToSamplesIndex((int) (width * 0.75), width) && autoMove)
                 session.sumOffsetNotRel(size - precSize);
 
             for (int i = 0; i < width; i++) {
@@ -55,11 +57,34 @@ public class AudioCanvas extends View {
             }
 
             // disegna la recBar
-            drawLineRelative(c, controlBarColor, size, height - height / 4f, height / 4f);
+            drawLineRelative(c, controlBarColor, size, height, 0);
 
             // disegna la playBar
             drawLineRelative(c, blue, track.getPlayerBufferPos(), height, 0);
             precSize = size;
+
+        }
+    }
+
+    private void drawTimeLines(Canvas c){
+        double firstSec = session.getOffsetAt0()/(double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view
+        float viewWidthInSec = session.getTrackViewWidth() / (float)session.getSampleRate(); // lunghezza in secondi della view
+
+        float reduxFactor = ((float) session.getTrackViewWidth() / (float) (session.getSampleRate() * 10));
+//            float reduxFactor = ((float) session.getTrackViewWidth() / (float) (width*400));
+        for (int i = 1; i < reduxFactors.length; i++)
+            if (reduxFactor > reduxFactors[i - 1] && reduxFactor <= reduxFactors[i]) {
+                reduxFactor = reduxFactors[i];
+                break;
+            }
+
+        firstSec = SupportMath.floorModD(firstSec, reduxFactor);
+//            Log.e("AAAAA", "firstSec: "+firstSec+" rf: "+reduxFactor );
+        for (double i = firstSec; i <= firstSec + viewWidthInSec + reduxFactor; i += reduxFactor) {
+            int posX = session.fromSamplesIndexToViewIndex((int)(i * session.getSampleRate()), getWidth());
+            int posXhalf = session.fromSamplesIndexToViewIndex((int)((i+reduxFactor/2) * session.getSampleRate()), getWidth());
+            c.drawRect(posX - 1.5f, 0, posX + 1.5f, getHeight(), linesColor);
+            c.drawRect(posXhalf - 0.5f, 0, posXhalf + 0.5f, getHeight(), linesColor);
         }
     }
 
@@ -67,64 +92,32 @@ public class AudioCanvas extends View {
      * Disegna una linea verticale con la posizione relativa all'offset e allo stretch
      * della linea del tempo
      *
-     * @param canvas
-     * @param paint
-     * @param x
+     * @param canvas canvas su cui disegnare la linea
+     * @param paint  colore
+     * @param x      posizione x
      * @param y1     y sotto
      * @param y2     y sopra
      */
     private void drawLineRelative(Canvas canvas, Paint paint, int x, float y1, float y2) {
-        canvas.drawLine(fromSamplesIndexToViewIndex(x), y1, fromSamplesIndexToViewIndex(x), y2, paint);
+        canvas.drawLine(session.fromSamplesIndexToViewIndex(x, getWidth()), y1, session.fromSamplesIndexToViewIndex(x, getWidth()), y2, paint);
     }
 
     /**
      * legge il valore della trackVisualization e lo normalizza
      * in base al picco corrente
      *
-     * @param index
-     * @return
+     * @param index indirizzo della view
+     * @return valore normalizzato
      */
     private float readNormalized(int index) {
         if (track == null)
             return 0;
-        float val = track.read(fromViewIndexToSamplesIndex(index));
+        float val = track.read(session.fromViewIndexToSamplesIndex(index, getWidth()));
         val = Math.abs(val);
         if (valMax < val)
             valMax = (int) val + 5;
         val = val * ((float) getHeight() / (float) (valMax * 2));
         return val;
-    }
-
-    private int fromViewIndexToSamplesIndex(int i) {
-        int trackViewWidth = session.getTrackViewWidth();
-        int offset = session.getOffset();
-
-        // il rapporto dev'essere approssimato per difetto
-        int widthRatio = SupportMath.floorDiv(trackViewWidth, getWidth());
-
-        // viene preso il valore dell'offset piú vicino ad un multiplo del widthRatio
-        // per mantenere gli stessi valori durante lo slide della traccia
-        int offsetMod = SupportMath.floorMod(offset, widthRatio);
-
-        // centro l'offset per avere uno zoom centrale durante la ScaleGesture
-        int start2 = (offsetMod - trackViewWidth / 2);
-
-        // quando é molto zoommato l'approssimazione del widthRatio rende lo zoom scattoso, in questo modo si aggira il problema
-        float retWidthRatio = widthRatio <= 18 ? ((float) trackViewWidth / (float) getWidth()) : widthRatio;
-
-        return start2 + (int) (i * retWidthRatio);
-    }
-
-    private int fromSamplesIndexToViewIndex(int i) {
-        double start1 = session.getOffset() - session.getTrackViewWidth() / 2f;
-        return (int) (((i - start1) / session.getTrackViewWidth()) * getWidth());
-    }
-
-    private float fromSamplesIndexToViewIndexFloat(float i) {
-        float tvw = session.getTrackViewWidth();
-        float width = (float) this.getWidth();
-        float start1 = session.getOffset() - tvw / 2f;
-        return ((i - start1) / tvw) * width;
     }
 
     @Override

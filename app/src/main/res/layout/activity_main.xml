@@ -51,7 +51,7 @@
                 <com.tessari.jamrec.AudioCanvas
                     android:id="@+id/audioCanvas"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="150dp"
                     drawable:layout_constraintEnd_toEndOf="parent"
                     drawable:layout_constraintHorizontal_bias="1.0"
                     drawable:layout_constraintStart_toStartOf="parent"
