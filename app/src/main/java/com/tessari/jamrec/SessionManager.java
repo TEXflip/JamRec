@@ -21,6 +21,7 @@ class SessionManager {
     Track track;
     private Recorder recorder;
     private int bufferSize = 1024, sampleRate = 44100;
+    private float pBPosFloat = 0;
     private int offset = 0, trackViewWidth;
     public long millis = 0;
 
@@ -87,6 +88,7 @@ class SessionManager {
 
     void restartPlay() {
         track.resetPlay();
+        pBPosFloat = 0;
         updateCanvas();
     }
 
@@ -114,17 +116,18 @@ class SessionManager {
         return sampleRate;
     }
 
-    int getPlayBarPos(){
+    int getPlayBarPos() {
         return track.getPlayerBufferPos();
     }
 
-    void sumPlayBarPos(int x){
-        track.setPlayerBufferPos(track.getPlayerBufferPos()+x*(trackViewWidth / audioCanvas.getWidth()));
+    float getViewsRatio(){
+        return ((float) trackViewWidth/(float)audioCanvas.getWidth());
     }
 
     /**
      * allarga o diminuisce la dimensione della trackViewWidth
      * min = viewWidth, max = Integer.MAX
+     *
      * @param x quantitá di zoom
      */
     void sumTrackViewWidth(double x) {
@@ -136,7 +139,7 @@ class SessionManager {
     }
 
     void sumOffset(int x) {
-        sumOffsetNotRel(x * (trackViewWidth / audioCanvas.getWidth()));
+        sumOffsetNotRel(x * (int)getViewsRatio());
     }
 
     void sumOffsetNotRel(int x) {
@@ -161,7 +164,7 @@ class SessionManager {
         return start2 + (int) (i * retWidthRatio);
     }
 
-    int fromSamplesIndexToViewIndex(int i,int width) {
+    int fromSamplesIndexToViewIndex(int i, int width) {
         double start1 = offset - trackViewWidth / 2f;
         return (int) (((i - start1) / trackViewWidth) * width);
     }
@@ -171,7 +174,7 @@ class SessionManager {
         stretchDetector.onTouchEvent(e);
     }
 
-    void onTouchTimebarEvent(MotionEvent e){
+    void onTouchTimebarEvent(MotionEvent e) {
         timebarScrollDetector.onTouchEvent(e);
     }
 
@@ -195,9 +198,10 @@ class SessionManager {
     class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-            sumPlayBarPos((int)v);
+//            Log.e("pointer", ""+motionEvent.getX(0) );
+            if (!isPlaying())
+                track.sumPlayBarPos(v);
             updateCanvas();
-            Log.e("VVVVVVVVVVV", ""+v );
             return true;
         }
     }

@@ -4,6 +4,8 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
 
+import com.tessari.jamrec.Utils.SupportMath;
+
 import java.util.Vector;
 
 class Track {
@@ -14,6 +16,7 @@ class Track {
     private PlayerThread playerThread;
     private SessionManager session;
     private int bufferSize, playerBufferPos = 0;
+    private float pBPosFloat = 0;
     private boolean isPlaying = false;
 
     Track(int sampleRate, int bufferSize, int audio_encoding,
@@ -76,7 +79,8 @@ class Track {
 //                for (int i = 0; i < bufferDivider; i++) {
 //                    audioTrack.write(trackSamples.get(playerBufferPos / bufferDivider), (bufferSize / bufferDivider) * i, bufferSize / bufferDivider, AudioTrack.WRITE_BLOCKING);
                 audioTrack.write(trackSamples.get(playerBufferPos), 0, bufferSize, AudioTrack.WRITE_BLOCKING);
-                playerBufferPos++;
+                incrementBufferPos();
+
 //                }
                 session.updateCanvas();
             }
@@ -87,6 +91,11 @@ class Track {
         return playerBufferPos * bufferSize;
     }
 
+    void sumPlayBarPos(float x) {
+        pBPosFloat = SupportMath.constraint(pBPosFloat - (x * (session.getViewsRatio()/1024f)), 0, size() / (float) bufferSize);
+        setPlayerBufferPos((int) pBPosFloat);
+    }
+
     void setPlayerBufferPos(int x) {
         if (x > trackSamples.size())
             playerBufferPos = trackSamples.size() - 1;
@@ -94,6 +103,12 @@ class Track {
             playerBufferPos = 0;
         else
             playerBufferPos = x;
+        pBPosFloat = playerBufferPos;
+    }
+
+    private void incrementBufferPos(){
+        playerBufferPos++;
+        pBPosFloat += 1;
     }
 
     int size() {
