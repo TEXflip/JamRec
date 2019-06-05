@@ -16,7 +16,6 @@ class Track {
     private PlayerThread playerThread;
     private SessionManager session;
     private int bufferSize, playerBufferPos = 0;
-    private float pBPosFloat = 0;
     private boolean isPlaying = false;
 
     Track(int sampleRate, int bufferSize, int audio_encoding,
@@ -46,7 +45,7 @@ class Track {
 
     void resetPlay() {
         if (isPlaying) session.pausePlay();
-        playerBufferPos = 0;
+        setPlayerBufferPos(0);
     }
 
     boolean isPlaying() {
@@ -58,8 +57,6 @@ class Track {
         for (int a = 0; a < elem.length; a++) {
             trackVisualization.add(elem[a]);
             long time = System.currentTimeMillis() - session.millis;
-//            if( time>998 && time<1002)
-//                Log.e("timeeeeee", ""+trackVisualization.size());
         }
     }
 
@@ -72,43 +69,39 @@ class Track {
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (playerBufferPos >= trackSamples.size()) {
+                if (playerBufferPos >= trackVisualization.size()) {
                     session.pausePlay();
                     break;
                 }
-//                for (int i = 0; i < bufferDivider; i++) {
-//                    audioTrack.write(trackSamples.get(playerBufferPos / bufferDivider), (bufferSize / bufferDivider) * i, bufferSize / bufferDivider, AudioTrack.WRITE_BLOCKING);
-                audioTrack.write(trackSamples.get(playerBufferPos), 0, bufferSize, AudioTrack.WRITE_BLOCKING);
-                incrementBufferPos();
-
-//                }
+                int samplesOffset = playerBufferPos % bufferSize;
+                int NsamplesRead = audioTrack.write(trackSamples.get(SupportMath.floorDiv(playerBufferPos, bufferSize)),
+                        samplesOffset,
+                        bufferSize - samplesOffset,
+                        AudioTrack.WRITE_BLOCKING);
+                playerBufferPos += NsamplesRead;
+                if (NsamplesRead < 0)
+                    Log.e("Track", "Audio Write Error");
                 session.updateCanvas();
             }
         }
     }
 
     int getPlayerBufferPos() {
-        return playerBufferPos * bufferSize;
+        return playerBufferPos;
     }
 
     void sumPlayBarPos(float x) {
-        pBPosFloat = SupportMath.constraint(pBPosFloat - (x * (session.getViewsRatio()/1024f)), 0, size() / (float) bufferSize);
-        setPlayerBufferPos((int) pBPosFloat);
+        Log.e("EEEEEEEEE",  ""+(playerBufferPos +  x * session.getViewsRatio()));
+        setPlayerBufferPos((int)(playerBufferPos +  x * session.getViewsRatio()));
     }
 
-    void setPlayerBufferPos(int x) {
-        if (x > trackSamples.size())
-            playerBufferPos = trackSamples.size() - 1;
-        else if(x < 0)
+    private void setPlayerBufferPos(int x) {
+        if (x > trackVisualization.size())
+            playerBufferPos = trackVisualization.size() - 1;
+        else if (x <= 0)
             playerBufferPos = 0;
         else
             playerBufferPos = x;
-        pBPosFloat = playerBufferPos;
-    }
-
-    private void incrementBufferPos(){
-        playerBufferPos++;
-        pBPosFloat += 1;
     }
 
     int size() {

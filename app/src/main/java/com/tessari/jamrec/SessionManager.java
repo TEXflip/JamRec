@@ -88,7 +88,6 @@ class SessionManager {
 
     void restartPlay() {
         track.resetPlay();
-        pBPosFloat = 0;
         updateCanvas();
     }
 
@@ -198,9 +197,8 @@ class SessionManager {
     class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-//            Log.e("pointer", ""+motionEvent.getX(0) );
             if (!isPlaying())
-                track.sumPlayBarPos(v);
+                track.sumPlayBarPos(-v);
             updateCanvas();
             return true;
         }
