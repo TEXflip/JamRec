@@ -10,17 +10,19 @@ import java.util.Vector;
 
 class Track {
 
-    private Vector<Short> trackVisualization;
+    //private Vector<Short> trackVisualization;
+    short[] data;
     private Vector<short[]> trackSamples;
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
-    private int bufferSize, playerBufferPos = 0;
+    private int bufferSize, playerBufferPos = 0, size = 0;
     private boolean isPlaying = false;
+    boolean syncActivation = true;
 
     Track(int sampleRate, int bufferSize, int audio_encoding,
           int audio_channel_out, SessionManager session) {
-        trackVisualization = new Vector<>();
+        //trackVisualization = new Vector<>();
         trackSamples = new Vector<>();
         this.bufferSize = bufferSize;
         this.session = session;
@@ -28,6 +30,7 @@ class Track {
                 audio_channel_out,
                 audio_encoding, bufferSize,
                 AudioTrack.MODE_STREAM);
+        data = new short[bufferSize];
     }
 
     void play() {
@@ -53,23 +56,39 @@ class Track {
     }
 
     void write(short[] elem) {
-        trackSamples.add(elem);
-        for (int a = 0; a < elem.length; a++) {
-            trackVisualization.add(elem[a]);
-            long time = System.currentTimeMillis() - session.millis;
+        for (int i = 0; i < elem.length; i++) {
+            if(syncActivation){
+                if(Math.abs(elem[i]) > 3)
+                    syncActivation = false;
+            }
+            if(!syncActivation){
+                //trackVisualization.add(elem[i]);
+                if(size != 0 && size % bufferSize == 0) {
+                    trackSamples.add(data);
+                    data = new short[elem.length];
+                }
+                data[size%bufferSize] = elem[i];
+                size++;
+            }
         }
+//            if(trackVisualization.size() < 0.3*44100)
+//            Log.e("AAAAAa", "time: "+((trackVisualization.size()*1000f)/44100f)+" - "+i+"" );
+
+//        if(!syncActivation)
+//            trackSamples.add(elem);
     }
 
     short read(int index) {
-        if (index >= trackVisualization.size() || index < 0)
+        if (SupportMath.floorDiv(index,bufferSize) >= /*trackVisualization.size()*/SupportMath.floorDiv(size,bufferSize) || index < 0)
             return 0;
-        return trackVisualization.get(index);
+//        return trackVisualization.get(index);
+        return trackSamples.get(SupportMath.floorDiv(index,bufferSize))[index%bufferSize];
     }
 
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (playerBufferPos >= trackVisualization.size()) {
+                if (SupportMath.floorDiv(playerBufferPos,bufferSize) >= /*trackVisualization.size()*/ SupportMath.floorDiv(size,bufferSize)) {
                     session.pausePlay();
                     break;
                 }
@@ -86,25 +105,28 @@ class Track {
         }
     }
 
+    int size(){
+        return SupportMath.floorMod(size, bufferSize);
+    }
+
     int getPlayerBufferPos() {
         return playerBufferPos;
     }
 
     void sumPlayBarPos(float x) {
-        Log.e("EEEEEEEEE",  ""+(playerBufferPos +  x * session.getViewsRatio()));
         setPlayerBufferPos((int)(playerBufferPos +  x * session.getViewsRatio()));
     }
 
     private void setPlayerBufferPos(int x) {
-        if (x > trackVisualization.size())
-            playerBufferPos = trackVisualization.size() - 1;
+        if (x >= /*trackVisualization.size()*/size)
+            playerBufferPos = /*trackVisualization.size()*/size - 1;
         else if (x <= 0)
             playerBufferPos = 0;
         else
             playerBufferPos = x;
     }
 
-    int size() {
-        return trackVisualization.size();
-    }
+//    int size() {
+//        return trackVisualization.size();
+//    }
 }

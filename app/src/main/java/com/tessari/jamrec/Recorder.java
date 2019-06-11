@@ -1,13 +1,11 @@
 package com.tessari.jamrec;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
 class Recorder {
     private AudioRecord recorder;
-    private MediaRecorder redorder2;
     private SessionManager session;
     private boolean isRecording = false;
     private Thread recordingThread;
@@ -24,13 +22,13 @@ class Recorder {
         recordingThread = new RecordingThread();
         recorder.startRecording();
         recordingThread.start();
-        session.millis = System.currentTimeMillis();
     }
 
     void stop() {
         isRecording = false;
         recorder.stop();
         recordingThread = null;
+        session.track.syncActivation = true;
     }
 
     boolean isRecording() {
@@ -39,9 +37,8 @@ class Recorder {
 
     public class RecordingThread extends Thread {
         public void run() {
-            short[] data;
+            short[] data = new short[bufferSize];
             while (isRecording) {
-                data = new short[bufferSize];
                 recorder.read(data, 0, bufferSize, AudioRecord.READ_BLOCKING);
                 session.track.write(data);
                 session.updateCanvas();

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 
-        bufferSize = 44100; // AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
+        bufferSize = 1024; // AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out);
 
         ((ScrollView)findViewById(R.id.track_list)).setOnTouchListener(new View.OnTouchListener() {

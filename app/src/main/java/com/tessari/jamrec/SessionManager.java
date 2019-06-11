@@ -19,7 +19,7 @@ class SessionManager {
     private Timebar timebar;
     private ToggleButton button_rec, button_play;
     Track track;
-    private Recorder recorder;
+    Recorder recorder;
     private int bufferSize = 1024, sampleRate = 44100;
     private float pBPosFloat = 0;
     private int offset = 0, trackViewWidth;
