@@ -57,17 +57,17 @@ class Track {
 
     void write(short[] elem) {
         for (int i = 0; i < elem.length; i++) {
-            if(syncActivation){
-                if(Math.abs(elem[i]) > 3)
+            if (syncActivation) {
+                if (Math.abs(elem[i]) > 3)
                     syncActivation = false;
             }
-            if(!syncActivation){
+            if (!syncActivation) {
                 //trackVisualization.add(elem[i]);
-                if(size != 0 && size % bufferSize == 0) {
+                if (size != 0 && size % bufferSize == 0) {
                     trackSamples.add(data);
                     data = new short[elem.length];
                 }
-                data[size%bufferSize] = elem[i];
+                data[size % bufferSize] = elem[i];
                 size++;
             }
         }
@@ -79,16 +79,16 @@ class Track {
     }
 
     short read(int index) {
-        if (SupportMath.floorDiv(index,bufferSize) >= /*trackVisualization.size()*/SupportMath.floorDiv(size,bufferSize) || index < 0)
+        if (SupportMath.floorDiv(index, bufferSize) >= /*trackVisualization.size()*/SupportMath.floorDiv(size-1, bufferSize) || index < 0)
             return 0;
 //        return trackVisualization.get(index);
-        return trackSamples.get(SupportMath.floorDiv(index,bufferSize))[index%bufferSize];
+        return trackSamples.get(SupportMath.floorDiv(index, bufferSize))[index % bufferSize];
     }
 
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (SupportMath.floorDiv(playerBufferPos,bufferSize) >= /*trackVisualization.size()*/ SupportMath.floorDiv(size,bufferSize)) {
+                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= /*trackVisualization.size()*/ SupportMath.floorDiv(size-1, bufferSize)) {
                     session.pausePlay();
                     break;
                 }
@@ -105,7 +105,7 @@ class Track {
         }
     }
 
-    int size(){
+    int size() {
         return SupportMath.floorMod(size, bufferSize);
     }
 
@@ -114,7 +114,7 @@ class Track {
     }
 
     void sumPlayBarPos(float x) {
-        setPlayerBufferPos((int)(playerBufferPos +  x * session.getViewsRatio()));
+        setPlayerBufferPos((int) (playerBufferPos + x * session.getViewsRatio()));
     }
 
     private void setPlayerBufferPos(int x) {
