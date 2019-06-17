@@ -26,7 +26,8 @@ public class AudioCanvas extends View {
     private int precSize = 0, valMax = 100;
     boolean autoMove = true;
     private Bitmap img;
-    private Allocation allocA;
+    ScriptC_wave wave;
+    Allocation alloc,alloc_samples;
     private RenderScript rs;
     private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 20, 60 * 60, 60 * 60 * 2, 60 * 60 * 5, 60 * 60 * 10, 60 * 60 * 20, 60 * 60 * 24};
 
@@ -48,24 +49,29 @@ public class AudioCanvas extends View {
         linesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
         linesColor.setStyle(Paint.Style.FILL);
 
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                img = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+                alloc = Allocation.createFromBitmap(rs, img);
+                alloc_samples = Allocation.createSized(rs, Element.I16(rs), track.size()+1);
+                wave = new ScriptC_wave(rs);
+                pls();
+            }
+        });
+
         rs = RenderScript.create(c);
     }
 
     private void pls() {
-        img = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-
-        Allocation alloc = Allocation.createFromBitmap(rs, img);
-        ScriptC_wave wave = new ScriptC_wave(rs);
-
-        Allocation alloc_samples = Allocation.createSized(rs, Element.I16(rs), track.size());
         alloc_samples.copyFrom(track.getSamples());
-
-
         wave.set_samples(alloc_samples);
-        wave.set_width(getWidth());
-        wave.set_height(getHeight());
+        wave.set_width((int)getWidth());
+        wave.set_height((float)getHeight());
+        wave.set_offset(session.getOffset());
+        wave.set_trackViewWidth((int)session.getTrackViewWidth());
+        wave.set_size(track.size());
         wave.forEach_root(alloc);
-        rs.finish();
         alloc.copyTo(img);
     }
 
@@ -74,6 +80,7 @@ public class AudioCanvas extends View {
         super.onDraw(c);
         pls();
         c.drawBitmap(img, 0, 0, null);
+        drawTimeLines(c);
     }
 
     /*@Override

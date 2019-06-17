@@ -1,6 +1,5 @@
 package com.tessari.jamrec;
 
-import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
@@ -8,11 +7,13 @@ import android.util.Log;
 import com.tessari.jamrec.Utils.CustomVector;
 import com.tessari.jamrec.Utils.SupportMath;
 
+import java.util.Vector;
+
 class Track {
 
     short[] data;
-    private CustomVector<Short> visual;
-    private CustomVector<short[]> trackSamples;
+    private CustomVector visual;
+    private Vector<short[]> trackSamples;
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
@@ -23,7 +24,7 @@ class Track {
     Track(int sampleRate, int bufferSize, int audio_encoding,
           int audio_channel_out, SessionManager session) {
 
-        trackSamples = new CustomVector<>();
+        trackSamples = new Vector<>();
         this.bufferSize = bufferSize;
         this.session = session;
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
@@ -31,6 +32,8 @@ class Track {
                 audio_encoding, bufferSize,
                 AudioTrack.MODE_STREAM);
         data = new short[bufferSize];
+        visual = new CustomVector();
+        visual.add((short)0);
     }
 
     void play() {
@@ -113,8 +116,8 @@ class Track {
         return playerBufferPos;
     }
 
-    Short[] getSamples(){
-        return (Short[]) visual.toArray();
+    short[] getSamples(){
+        return visual.toArray();
     }
 
     void sumPlayBarPos(float x) {
