@@ -11,6 +11,7 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -35,8 +36,8 @@ public class AudioCanvas extends View {
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
         wavesColor = new Paint();
-//        wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
-//        wavesColor.setStyle(Paint.Style.FILL);
+        wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
+        wavesColor.setStyle(Paint.Style.FILL);
         controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         controlBarColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
         controlBarColor.setStyle(Paint.Style.FILL);
@@ -54,7 +55,7 @@ public class AudioCanvas extends View {
             public void onGlobalLayout() {
                 img = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 alloc = Allocation.createFromBitmap(rs, img);
-                alloc_samples = Allocation.createSized(rs, Element.I16(rs), track.size()+1);
+                alloc_samples = Allocation.createSized(rs, Element.I16(rs), track.size()+1,Allocation.USAGE_SCRIPT);
                 wave = new ScriptC_wave(rs);
                 pls();
             }
@@ -65,11 +66,15 @@ public class AudioCanvas extends View {
 
     private void pls() {
         alloc_samples.copyFrom(track.getSamples());
+//        Log.e("AAAAAAAAAAAAAAAAA", "pls: " );
+//        for (int i = 0; i < track.getSamples().length; i++) {
+//            Log.e("PLSSSSSSSSS", i+" - "+track.getSamples()[i] );
+//        }
         wave.set_samples(alloc_samples);
-        wave.set_width((int)getWidth());
+        wave.set_width((float)getWidth());
         wave.set_height((float)getHeight());
         wave.set_offset(session.getOffset());
-        wave.set_trackViewWidth((int)session.getTrackViewWidth());
+        wave.set_trackViewWidth((float)session.getTrackViewWidth());
         wave.set_size(track.size());
         wave.forEach_root(alloc);
         alloc.copyTo(img);

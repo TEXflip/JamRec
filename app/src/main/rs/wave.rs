@@ -7,10 +7,10 @@
 rs_allocation samples;
 
 uint32_t bufferSize;
-int width;
+float width;
 float height;
 int32_t offset;
-int trackViewWidth;
+float trackViewWidth;
 uint32_t size;
 int valMax = 100;
 
@@ -21,7 +21,7 @@ uchar4 __attribute__((kernel)) root(uint32_t x, uint32_t y) {
     int i = start2 + (x * (trackViewWidth / width));
     int v = 1;
     if(i >= 0 && i < size){
-        v = (int)rsGetElementAt_short(samples, i);
+        v = rsGetElementAt_short(samples, i);
         //v = abs(v);
 
         if (valMax < v)
@@ -35,7 +35,6 @@ uchar4 __attribute__((kernel)) root(uint32_t x, uint32_t y) {
         out.b = 198;
         out.a = 255;
     }
-
 
     return out;
 }

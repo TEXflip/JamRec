@@ -80,7 +80,6 @@ class Track {
     short read(int index) {
         if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(size - 1, bufferSize) || index < 0)
             return 0;
-//        return trackVisualization.get(index);
         return trackSamples.get(SupportMath.floorDiv(index, bufferSize))[index % bufferSize];
     }
 
