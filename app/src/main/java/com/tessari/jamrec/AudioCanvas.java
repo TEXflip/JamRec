@@ -1,13 +1,19 @@
 package com.tessari.jamrec;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.Type;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 import com.tessari.jamrec.Utils.SupportMath;
 
@@ -19,14 +25,17 @@ public class AudioCanvas extends View {
     private SessionManager session = null;
     private int precSize = 0, valMax = 100;
     boolean autoMove = true;
+    private Bitmap img;
+    private Allocation allocA;
+    private RenderScript rs;
     private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 20, 60 * 60, 60 * 60 * 2, 60 * 60 * 5, 60 * 60 * 10, 60 * 60 * 20, 60 * 60 * 24};
 
 
     public AudioCanvas(Context c, AttributeSet set) {
         super(c, set);
-        wavesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-        wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
-        wavesColor.setStyle(Paint.Style.FILL);
+        wavesColor = new Paint();
+//        wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
+//        wavesColor.setStyle(Paint.Style.FILL);
         controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         controlBarColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
         controlBarColor.setStyle(Paint.Style.FILL);
@@ -38,9 +47,36 @@ public class AudioCanvas extends View {
         linesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         linesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
         linesColor.setStyle(Paint.Style.FILL);
+
+        rs = RenderScript.create(c);
+    }
+
+    private void pls() {
+        img = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+
+        Allocation alloc = Allocation.createFromBitmap(rs, img);
+        ScriptC_wave wave = new ScriptC_wave(rs);
+
+        Allocation alloc_samples = Allocation.createSized(rs, Element.I16(rs), track.size());
+        alloc_samples.copyFrom(track.getSamples());
+
+
+        wave.set_samples(alloc_samples);
+        wave.set_width(getWidth());
+        wave.set_height(getHeight());
+        wave.forEach_root(alloc);
+        rs.finish();
+        alloc.copyTo(img);
     }
 
     @Override
+    protected void onDraw(Canvas c) {
+        super.onDraw(c);
+        pls();
+        c.drawBitmap(img, 0, 0, null);
+    }
+
+    /*@Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (session != null) {
@@ -68,7 +104,7 @@ public class AudioCanvas extends View {
             precSize = size;
 
         }
-    }
+    }*/
 
     private void drawTimeLines(Canvas c) {
         double firstSec = session.getOffsetAt0() / (double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view

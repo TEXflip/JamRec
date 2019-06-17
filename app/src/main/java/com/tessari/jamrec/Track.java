@@ -1,18 +1,18 @@
 package com.tessari.jamrec;
 
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
 
+import com.tessari.jamrec.Utils.CustomVector;
 import com.tessari.jamrec.Utils.SupportMath;
-
-import java.util.Vector;
 
 class Track {
 
-    //private Vector<Short> trackVisualization;
     short[] data;
-    private Vector<short[]> trackSamples;
+    private CustomVector<Short> visual;
+    private CustomVector<short[]> trackSamples;
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
@@ -22,8 +22,8 @@ class Track {
 
     Track(int sampleRate, int bufferSize, int audio_encoding,
           int audio_channel_out, SessionManager session) {
-        //trackVisualization = new Vector<>();
-        trackSamples = new Vector<>();
+
+        trackSamples = new CustomVector<>();
         this.bufferSize = bufferSize;
         this.session = session;
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
@@ -38,11 +38,12 @@ class Track {
         playerThread = new PlayerThread();
         isPlaying = true;
         playerThread.start();
+
     }
 
     void pause() {
         isPlaying = false; // prima cosa da fare o audioTrack.write() non blocca
-        audioTrack.pause();
+        audioTrack.stop();
         playerThread = null;
     }
 
@@ -62,24 +63,19 @@ class Track {
                     syncActivation = false;
             }
             if (!syncActivation) {
-                //trackVisualization.add(elem[i]);
                 if (size != 0 && size % bufferSize == 0) {
                     trackSamples.add(data);
                     data = new short[elem.length];
                 }
                 data[size % bufferSize] = elem[i];
+                visual.add(elem[i]);
                 size++;
             }
         }
-//            if(trackVisualization.size() < 0.3*44100)
-//            Log.e("AAAAAa", "time: "+((trackVisualization.size()*1000f)/44100f)+" - "+i+"" );
-
-//        if(!syncActivation)
-//            trackSamples.add(elem);
     }
 
     short read(int index) {
-        if (SupportMath.floorDiv(index, bufferSize) >= /*trackVisualization.size()*/SupportMath.floorDiv(size-1, bufferSize) || index < 0)
+        if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(size - 1, bufferSize) || index < 0)
             return 0;
 //        return trackVisualization.get(index);
         return trackSamples.get(SupportMath.floorDiv(index, bufferSize))[index % bufferSize];
@@ -88,7 +84,7 @@ class Track {
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= /*trackVisualization.size()*/ SupportMath.floorDiv(size-1, bufferSize)) {
+                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= SupportMath.floorDiv(size - 1, bufferSize)) {
                     session.pausePlay();
                     break;
                 }
@@ -98,8 +94,8 @@ class Track {
                         bufferSize - samplesOffset,
                         AudioTrack.WRITE_BLOCKING);
                 playerBufferPos += NsamplesRead;
-                if (NsamplesRead < 0)
-                    Log.e("Track", "Audio Write Error");
+//                if (NsamplesRead < 0)
+//                    Log.e("Track", "Audio Write Error");
                 session.updateCanvas();
             }
         }
@@ -109,8 +105,16 @@ class Track {
         return SupportMath.floorMod(size, bufferSize);
     }
 
+    int nOfBuffers() {
+        return SupportMath.floorDiv(size, bufferSize);
+    }
+
     int getPlayerBufferPos() {
         return playerBufferPos;
+    }
+
+    Short[] getSamples(){
+        return (Short[]) visual.toArray();
     }
 
     void sumPlayBarPos(float x) {
@@ -118,15 +122,12 @@ class Track {
     }
 
     private void setPlayerBufferPos(int x) {
-        if (x >= /*trackVisualization.size()*/size)
-            playerBufferPos = /*trackVisualization.size()*/size - 1;
+        if (x >= size)
+            playerBufferPos = size - 1;
         else if (x <= 0)
             playerBufferPos = 0;
         else
             playerBufferPos = x;
     }
 
-//    int size() {
-//        return trackVisualization.size();
-//    }
 }

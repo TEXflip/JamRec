@@ -1,5 +1,6 @@
 package com.tessari.jamrec;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -115,12 +116,16 @@ class SessionManager {
         return sampleRate;
     }
 
+    int getBufferSize() {
+        return bufferSize;
+    }
+
     int getPlayBarPos() {
         return track.getPlayerBufferPos();
     }
 
-    float getViewsRatio(){
-        return ((float) trackViewWidth/(float)audioCanvas.getWidth());
+    float getViewsRatio() {
+        return ((float) trackViewWidth / (float) audioCanvas.getWidth());
     }
 
     /**
@@ -138,7 +143,7 @@ class SessionManager {
     }
 
     void sumOffset(int x) {
-        sumOffsetNotRel(x * (int)getViewsRatio());
+        sumOffsetNotRel(x * (int) getViewsRatio());
     }
 
     void sumOffsetNotRel(int x) {

@@ -3,6 +3,7 @@ package com.tessari.jamrec;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
+import android.renderscript.RenderScript;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+//        android.renderscript.RenderScrip
     }
 
     public void recButtonOnClick(View v) {
