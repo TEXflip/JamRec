@@ -15,7 +15,7 @@ import com.tessari.jamrec.Utils.SupportMath;
 public class Timebar extends View {
     private Paint linesColor, textColor, blue;
     private SessionManager session;
-    private final float[] reduxFactors = {0, 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.5f, 1, 2, 5, 10, 20, 60, 60*2, 60*5, 60*10, 60*20, 60*60, 60*60*2, 60*60*5, 60*60*10, 60*60*20, 60*60*24};
+    private final long[] reduxFactors = {0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 60000, 60000 * 2, 60000 * 5, 60000 * 10, 60000 * 20, 60000 * 60, 60000 * 60 * 2, 60000 * 60 * 5, 60000 * 60 * 10, 60000 * 60 * 20, 60000 * 60 * 24};
 
     public Timebar(Context context, AttributeSet set) {
         super(context, set);
@@ -40,11 +40,10 @@ public class Timebar extends View {
             c.drawRect(0, 0, width, 4, linesColor);
 
 
+            double firstSec = 1000 * (session.getOffsetAt0() / (double) session.getSampleRate()); // il secondo che si trova piú a sinistra della view in ms
+            float viewWidthInSec = session.getTrackViewWidth() / (float) session.getSampleRate(); // lunghezza in secondi della view
 
-            double firstSec = session.getOffsetAt0()/(double) session.getSampleRate(); // il secondo che si trova piú a sinistra della view
-            float viewWidthInSec = session.getTrackViewWidth() / (float)session.getSampleRate(); // lunghezza in secondi della view
-
-            float reduxFactor = ((float) session.getTrackViewWidth() / (float) (session.getSampleRate() * 10));
+            double reduxFactor = 1000 * ((float) session.getTrackViewWidth() / (float) (session.getSampleRate() * 8));
 //            float reduxFactor = ((float) session.getTrackViewWidth() / (float) (width*400));
             for (int i = 1; i < reduxFactors.length; i++)
                 if (reduxFactor > reduxFactors[i - 1] && reduxFactor <= reduxFactors[i]) {
@@ -53,17 +52,16 @@ public class Timebar extends View {
                 }
 
             firstSec = SupportMath.floorModD(firstSec, reduxFactor);
-//            Log.e("AAAAA", "firstSec: "+firstSec+" rf: "+reduxFactor );
-            for (double i = firstSec; i <= firstSec + viewWidthInSec + reduxFactor; i += reduxFactor) {
-                int posX = session.fromSamplesIndexToViewIndex((int)(i * session.getSampleRate()), width);
-                int posXhalf = session.fromSamplesIndexToViewIndex((int)((i+reduxFactor/2) * session.getSampleRate()), width);
+            for (double i = firstSec; i <= firstSec + 1000 * viewWidthInSec + reduxFactor; i += reduxFactor) {
+                int posX = session.fromSamplesIndexToViewIndex((int) (i / 1000 * session.getSampleRate()), width);
+                int posXhalf = session.fromSamplesIndexToViewIndex((int) ((i / 1000 + reduxFactor / 2000) * session.getSampleRate()), width);
                 c.drawRect(posX - 1.5f, 0, posX + 1.5f, 35, linesColor);
                 c.drawRect(posXhalf - 1.5f, 0, posXhalf + 1.5f, 13, linesColor);
-                c.drawText(toTime(i, (int)reduxFactor), posX, 60, textColor);
+                c.drawText(toTime((long) i), posX, 60, textColor);
             }
 
             float PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
-            c.drawRoundRect(PBpos-30, 0, PBpos+30, height,25,25, blue);
+            c.drawRoundRect(PBpos - 30, 0, PBpos + 30, height, 25, 25, blue);
         }
     }
 
@@ -73,15 +71,39 @@ public class Timebar extends View {
         return true;
     }
 
-    private String toTime(double sec, int rf) {
-        if(sec == 0) return "" + 0;
-        String neg = sec < 0 ? "-" : "";
-        sec = Math.abs(sec);
-        if (rf < 60)
-            return neg + String.format(sec%1==0?"%.0f":"%.2f",sec);
-        if (rf < 3600)
-            return neg + ((int)sec / 60) + "m";
-        return neg + ((int)sec / 3600) + "h";
+    private String toTime(long millis) {
+        if (millis == 0) return "" + 0;
+        String neg = millis < 0 ? "-" : "";
+        millis = Math.abs(millis);
+        int ms = (((int) millis) % 1000) / 10;
+        int s = (((int) millis) / 1000) % 60;
+        int m = (int) (millis / 60000) % 60;
+        int h = (int) (millis / (60000 * 60)) % 24;
+        String time;
+        if (h == 0)
+            if (m == 0)
+                if (s == 0)
+                    time = String.format("%d0ms", ms);
+                else if (ms == 0)
+                    time = String.format("%ds", s);
+                else
+                    time = String.format("%d.%02d", s, ms);
+            else if (s == 0 && ms == 0)
+                time = String.format("%dm", m);
+            else if (s != 0 && ms == 0)
+                time = String.format("%d:%02d", m, s);
+            else
+                time = String.format("%2d:%02d.%02d", m, s, ms);
+        else if (m == 0 && s == 0 && ms == 0)
+            time = String.format("%dh", h);
+        else if (m != 0 && s == 0 && ms == 0)
+            time = String.format("%d:%02dh", h, m);
+        else if (m != 0 && s != 0 && ms == 0)
+            time = String.format("%d:%02d:%02d", h, m, s);
+        else
+            time = String.format("%d:%02d:%02d.%02d", h, m, s, ms);
+
+        return neg + time;
     }
 
     public void setSession(SessionManager session) {
