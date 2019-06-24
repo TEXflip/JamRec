@@ -1,7 +1,6 @@
 package com.tessari.jamrec;
 
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -16,7 +15,7 @@ class SessionManager {
 
     private AppCompatActivity context;
     private AudioCanvas audioCanvas;
-    private Timebar timebar;
+    private Timeline timeline;
     private ToggleButton button_rec, button_play;
     Track track;
     Recorder recorder;
@@ -30,7 +29,7 @@ class SessionManager {
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
         this.audioCanvas = context.findViewById(R.id.audioCanvas);
-        this.timebar = context.findViewById(R.id.timebar);
+        this.timeline = context.findViewById(R.id.timebar);
         this.sampleRate = sampleRate;
 
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
@@ -41,7 +40,7 @@ class SessionManager {
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
         audioCanvas.setTrack(track);
         audioCanvas.setSession(this);
-        timebar.setSession(this);
+        timeline.setSession(this);
         this.bufferSize = bufferSize;
         audioCanvas.post(new Runnable() {
             @Override
@@ -54,11 +53,11 @@ class SessionManager {
 
     void updateCanvas() {
         audioCanvas.invalidate();
-        timebar.invalidate();
+        timeline.invalidate();
     }
 
     void updateTimebar() {
-        timebar.invalidate();
+        timeline.invalidate();
     }
 
     void startRec() {
