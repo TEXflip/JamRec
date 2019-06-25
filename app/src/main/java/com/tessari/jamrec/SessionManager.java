@@ -16,9 +16,11 @@ class SessionManager {
     private AppCompatActivity context;
     private AudioCanvas audioCanvas;
     private Timeline timeline;
+    private Beatsline beatsline;
     private ToggleButton button_rec, button_play;
     Track track;
     Recorder recorder;
+    Metronome metronome;
     private int bufferSize = 1024, sampleRate = 44100;
     private float pBPosFloat = 0;
     private int offset = 0, trackViewWidth;
@@ -29,9 +31,10 @@ class SessionManager {
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
         this.audioCanvas = context.findViewById(R.id.audioCanvas);
-        this.timeline = context.findViewById(R.id.timebar);
+        this.timeline = context.findViewById(R.id.timeline);
+        this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
-
+        metronome = new Metronome();
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
         timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());
@@ -41,6 +44,7 @@ class SessionManager {
         audioCanvas.setTrack(track);
         audioCanvas.setSession(this);
         timeline.setSession(this);
+        beatsline.setSession(this);
         this.bufferSize = bufferSize;
         audioCanvas.post(new Runnable() {
             @Override
@@ -54,10 +58,12 @@ class SessionManager {
     void updateCanvas() {
         audioCanvas.invalidate();
         timeline.invalidate();
+        beatsline.invalidate();
     }
 
     void updateTimebar() {
         timeline.invalidate();
+        beatsline.invalidate();
     }
 
     void startRec() {

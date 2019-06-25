@@ -42,7 +42,7 @@ public class AudioCanvas extends View {
             int width = getWidth();
 
             // disegna le barre del tempo
-            lines.draw(c, width, height, height);
+            lines.drawBeat(c, width, height, height);
 
             int size = track == null ? 0 : track.size();
 

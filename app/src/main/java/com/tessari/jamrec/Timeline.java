@@ -30,7 +30,7 @@ public class Timeline extends View {
         if (session != null) {
             int width = this.getWidth(), height = this.getHeight();
             c.drawRect(0, 0, width, 4, linesColor);
-            lines.draw(c, getWidth(),35,13);
+            lines.drawTime(c, getWidth(),35,13);
             float PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
             c.drawRoundRect(PBpos - 30, 0, PBpos + 30, height, 25, 25, blue);
         }
