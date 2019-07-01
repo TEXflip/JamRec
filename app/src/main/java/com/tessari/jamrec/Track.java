@@ -87,7 +87,7 @@ class Track {
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= SupportMath.floorDiv(recPos - 1, bufferSize)) {
+                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= SupportMath.floorDiv(maxRecPos - 1, bufferSize)) {
                     session.pausePlay();
                     break;
                 }
