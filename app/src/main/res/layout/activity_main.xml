@@ -39,23 +39,27 @@
         <ScrollView
             android:id="@+id/track_list"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:fillViewport="true"
             drawable:layout_constraintBottom_toTopOf="@+id/beatsline"
             drawable:layout_constraintEnd_toEndOf="parent"
-            drawable:layout_constraintStart_toStartOf="parent">
+            drawable:layout_constraintStart_toStartOf="parent"
+            drawable:layout_constraintTop_toTopOf="parent">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:contextClickable="true"
+                android:isScrollContainer="true">
 
                 <com.tessari.jamrec.AudioCanvas
                     android:id="@+id/audioCanvas"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
+                    drawable:layout_constraintBottom_toBottomOf="parent"
                     drawable:layout_constraintEnd_toEndOf="parent"
-                    drawable:layout_constraintHorizontal_bias="1.0"
+                    drawable:layout_constraintHorizontal_bias="0.0"
                     drawable:layout_constraintStart_toStartOf="parent"
-                    drawable:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible">
 
                     <!--<LinearLayout-->
