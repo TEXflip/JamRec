@@ -1,15 +1,17 @@
 package com.tessari.jamrec;
 
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.ToggleButton;
 
-import com.tessari.jamrec.Utils.SupportMath;
+import com.tessari.jamrec.CustomView.AudioCanvas;
+import com.tessari.jamrec.CustomView.Beatsline;
+import com.tessari.jamrec.CustomView.Timeline;
+import com.tessari.jamrec.Util.SupportMath;
 
-class SessionManager {
+public class SessionManager {
 
     private ScaleGestureDetector stretchDetector;
     private GestureDetector scrollDetector, timebarScrollDetector, beatsbarScrollDetector;
@@ -19,9 +21,9 @@ class SessionManager {
     private Timeline timeline;
     private Beatsline beatsline;
     private ToggleButton button_rec, button_play;
-    Track track;
-    Recorder recorder;
-    Metronome metronome;
+    public Track track;
+    public Recorder recorder;
+    public Metronome metronome;
     long startTime, syncTime;
     private int bufferSize = 1024, sampleRate = 44100;
     private float pBPosFloat = 0;
@@ -58,23 +60,23 @@ class SessionManager {
         });
     }
 
-    void updateCanvas() {
+    public void updateCanvas() {
         audioCanvas.invalidate();
         timeline.invalidate();
         beatsline.invalidate();
     }
 
-    void updateTimebar() {
+    public void updateTimebar() {
         timeline.invalidate();
         beatsline.invalidate();
     }
 
-    void startRec() {
+    public void startRec() {
         recorder.startToRec();
         button_rec.setChecked(true);
     }
 
-    void stopRec() {
+    public void stopRec() {
         try {
             recorder.stop();
         } catch (InterruptedException e) {
@@ -83,7 +85,7 @@ class SessionManager {
         button_rec.setChecked(false);
     }
 
-    void startPlay() {
+    public void startPlay() {
         if (!isRecording()) {
             track.play();
             button_play.setChecked(true);
@@ -91,7 +93,7 @@ class SessionManager {
             button_play.setChecked(false);
     }
 
-    void pausePlay() {
+    public void pausePlay() {
         track.pause();
         context.runOnUiThread(new Runnable() {
             @Override
@@ -101,44 +103,44 @@ class SessionManager {
         });
     }
 
-    void restartPlay() {
+    public void restartPlay() {
         track.resetPlay();
         updateCanvas();
     }
 
-    boolean isRecording() {
+    public boolean isRecording() {
         return recorder.isRecording();
     }
 
-    boolean isPlaying() {
+    public boolean isPlaying() {
         return track.isPlaying();
     }
 
-    int getOffset() {
+    public int getOffset() {
         return offset;
     }
 
-    int getOffsetAt0() {
+    public int getOffsetAt0() {
         return offset - trackViewWidth / 2;
     }
 
-    int getTrackViewWidth() {
+    public int getTrackViewWidth() {
         return trackViewWidth;
     }
 
-    int getSampleRate() {
+    public int getSampleRate() {
         return sampleRate;
     }
 
-    int getPlayBarPos() {
+    public int getPlayBarPos() {
         return track.getPlayerBufferPos();
     }
 
-    int getRecBarPos(){
+    public int getRecBarPos(){
         return track.recPos();
     }
 
-    float getViewsRatio() {
+    public float getViewsRatio() {
         return ((float) trackViewWidth / (float) audioCanvas.getWidth());
     }
 
@@ -148,7 +150,7 @@ class SessionManager {
      *
      * @param x quantitá di zoom
      */
-    void sumTrackViewWidth(double x) {
+    public void sumTrackViewWidth(double x) {
         if (trackViewWidth - x < audioCanvas.getWidth())
             trackViewWidth = audioCanvas.getWidth();
         else
@@ -156,16 +158,16 @@ class SessionManager {
         updateCanvas();
     }
 
-    void sumOffset(int x) {
+    public void sumOffset(int x) {
         sumOffsetNotRel(x * (int) getViewsRatio());
     }
 
-    void sumOffsetNotRel(int x) {
+    public void sumOffsetNotRel(int x) {
         offset += x;
         updateCanvas();
     }
 
-    int fromViewIndexToSamplesIndex(int i, int width) {
+    public int fromViewIndexToSamplesIndex(int i, int width) {
         // il rapporto dev'essere approssimato per difetto
         int widthRatio = SupportMath.floorDiv(trackViewWidth, width);
 
@@ -182,25 +184,25 @@ class SessionManager {
         return start2 + (int) (i * retWidthRatio);
     }
 
-    int fromSamplesIndexToViewIndex(int i, int width) {
+    public int fromSamplesIndexToViewIndex(int i, int width) {
         double start1 = offset - trackViewWidth / 2f;
         return (int) (((i - start1) / trackViewWidth) * width);
     }
 
-    void onTouchViewEvent(MotionEvent e) {
+    public void onTouchViewEvent(MotionEvent e) {
         scrollDetector.onTouchEvent(e);
         stretchDetector.onTouchEvent(e);
     }
 
-    void onTouchTimebarEvent(MotionEvent e) {
+    public void onTouchTimebarEvent(MotionEvent e) {
         timebarScrollDetector.onTouchEvent(e);
     }
 
-    void onTouchBeatsbarEvent(MotionEvent e) {
+    public void onTouchBeatsbarEvent(MotionEvent e) {
         beatsbarScrollDetector.onTouchEvent(e);
     }
 
-    class ViewStretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+    public class ViewStretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
             double f = scaleGestureDetector.getScaleFactor() - 1;
@@ -209,7 +211,7 @@ class SessionManager {
         }
     }
 
-    class ViewScrollListener extends GestureDetector.SimpleOnGestureListener {
+    public class ViewScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
             sumOffset((int) v);
@@ -217,7 +219,7 @@ class SessionManager {
         }
     }
 
-    class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
+    public class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isPlaying())
@@ -227,7 +229,7 @@ class SessionManager {
         }
     }
 
-    class BeatsbarScrollListener extends GestureDetector.SimpleOnGestureListener {
+    public class BeatsbarScrollListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isRecording())

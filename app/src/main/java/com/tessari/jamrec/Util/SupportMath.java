@@ -1,4 +1,4 @@
-package com.tessari.jamrec.Utils;
+package com.tessari.jamrec.Util;
 
 /**
  * Classe Math custom per aggiungere le funzioni non presenti nella min API

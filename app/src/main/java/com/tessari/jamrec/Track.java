@@ -2,13 +2,12 @@ package com.tessari.jamrec;
 
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.util.Log;
 
-import com.tessari.jamrec.Utils.SupportMath;
+import com.tessari.jamrec.Util.SupportMath;
 
 import java.util.Vector;
 
-class Track {
+public class Track {
 
     short[] data;
     private Vector<short[]> trackSamples;
@@ -78,7 +77,7 @@ class Track {
         }
     }
 
-    short read(int index) {
+    public short read(int index) {
         if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(maxRecPos - 1, bufferSize) || index < 0)
             return 0;
         return trackSamples.get(SupportMath.floorDiv(index, bufferSize))[index % bufferSize];
@@ -102,7 +101,7 @@ class Track {
         }
     }
 
-    int recPos() {
+    public int recPos() {
         return SupportMath.floorMod(recPos, bufferSize);
     }
 

@@ -1,12 +1,13 @@
-package com.tessari.jamrec;
+package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
 
-import com.tessari.jamrec.Utils.SupportMath;
+import com.tessari.jamrec.R;
+import com.tessari.jamrec.SessionManager;
+import com.tessari.jamrec.Util.SupportMath;
 
 public class Timebars {
     private final long[] reduxFactorsTime = {0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 60000, 60000 * 2, 60000 * 5, 60000 * 10, 60000 * 20, 60000 * 60, 60000 * 60 * 2, 60000 * 60 * 5, 60000 * 60 * 10, 60000 * 60 * 20, 60000 * 60 * 24};

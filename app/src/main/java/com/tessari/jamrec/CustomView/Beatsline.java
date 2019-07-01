@@ -1,4 +1,4 @@
-package com.tessari.jamrec;
+package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,9 +7,12 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.tessari.jamrec.CustomView.Timebars;
+import com.tessari.jamrec.R;
+import com.tessari.jamrec.SessionManager;
 
 public class Beatsline extends View {
 
