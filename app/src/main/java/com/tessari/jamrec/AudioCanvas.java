@@ -44,7 +44,7 @@ public class AudioCanvas extends View {
             // disegna le barre del tempo
             lines.drawBeat(c, width, height, height);
 
-            int size = track == null ? 0 : track.size();
+            int size = track == null ? 0 : track.recPos();
 
             // se la recBar supera il 75% della schermata attiva l'automove
             if (size > session.fromViewIndexToSamplesIndex((int) (width * 0.75), width) && autoMove)

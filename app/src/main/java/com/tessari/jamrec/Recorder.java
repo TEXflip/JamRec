@@ -2,7 +2,6 @@ package com.tessari.jamrec;
 
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.util.Log;
 
 class Recorder {
     private AudioRecord recorder;
@@ -22,9 +21,12 @@ class Recorder {
         recordingThread = new RecordingThread();
         recorder.startRecording();
         recordingThread.start();
+        session.startTime = System.nanoTime();
     }
 
-    void stop() {
+    void stop() throws InterruptedException {
+//        long millis = session.syncTime/1000000;
+//        Thread.sleep(millis,(int) (session.syncTime-millis*1000000));
         isRecording = false;
         recorder.stop();
         recordingThread = null;

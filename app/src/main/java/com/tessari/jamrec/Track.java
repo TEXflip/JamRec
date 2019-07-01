@@ -15,7 +15,7 @@ class Track {
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
     private SessionManager session;
-    private int bufferSize, playerBufferPos = 0, size = 0;
+    private int bufferSize, playerBufferPos = 0, recPos = 0, maxRecPos = 0;
     private boolean isPlaying = false;
     boolean syncActivation = true;
 
@@ -37,7 +37,6 @@ class Track {
         playerThread = new PlayerThread();
         isPlaying = true;
         playerThread.start();
-
     }
 
     void pause() {
@@ -58,22 +57,29 @@ class Track {
     void write(short[] elem) {
         for (int i = 0; i < elem.length; i++) {
             if (syncActivation) {
-                if (Math.abs(elem[i]) > 3)
+                if (Math.abs(elem[i]) > 3) {
                     syncActivation = false;
+                    session.syncTime = System.nanoTime() - session.startTime;
+                }
             }
             if (!syncActivation) {
-                if (size != 0 && size % bufferSize == 0) {
-                    trackSamples.add(data);
+                if (recPos != 0 && recPos % bufferSize == 0) {
+                    if (trackSamples.size() <= (recPos / bufferSize) - 1)
+                        trackSamples.add(data);
+                    else
+                        trackSamples.set((recPos / bufferSize)-1, data);
                     data = new short[elem.length];
                 }
-                data[size % bufferSize] = elem[i];
-                size++;
+                data[recPos % bufferSize] = elem[i];
+                recPos++;
+                if(recPos > maxRecPos)
+                    maxRecPos = recPos;
             }
         }
     }
 
     short read(int index) {
-        if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(size - 1, bufferSize) || index < 0)
+        if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(maxRecPos - 1, bufferSize) || index < 0)
             return 0;
         return trackSamples.get(SupportMath.floorDiv(index, bufferSize))[index % bufferSize];
     }
@@ -81,7 +87,7 @@ class Track {
     private class PlayerThread extends Thread {
         public void run() {
             while (isPlaying) {
-                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= SupportMath.floorDiv(size - 1, bufferSize)) {
+                if (SupportMath.floorDiv(playerBufferPos, bufferSize) >= SupportMath.floorDiv(recPos - 1, bufferSize)) {
                     session.pausePlay();
                     break;
                 }
@@ -96,8 +102,12 @@ class Track {
         }
     }
 
-    int size() {
-        return SupportMath.floorMod(size, bufferSize);
+    int recPos() {
+        return SupportMath.floorMod(recPos, bufferSize);
+    }
+
+    void setRecordingPosition(int recPos) {
+        this.recPos = recPos;
     }
 
     int getPlayerBufferPos() {
@@ -108,9 +118,22 @@ class Track {
         setPlayerBufferPos((int) (playerBufferPos + x * session.getViewsRatio()));
     }
 
+    void sumRecPos(float x){
+        setRecPos((int) (recPos + x * session.getViewsRatio()));
+    }
+
+    private void setRecPos(int x){
+        if(x >= maxRecPos)
+            recPos = maxRecPos;
+        else if(x <= 0)
+            recPos = 0;
+        else
+            recPos = x;
+    }
+
     private void setPlayerBufferPos(int x) {
-        if (x >= size)
-            playerBufferPos = size - 1;
+        if (x >= maxRecPos)
+            playerBufferPos = maxRecPos - 1;
         else if (x <= 0)
             playerBufferPos = 0;
         else
