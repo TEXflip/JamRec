@@ -6,8 +6,14 @@
         <item name="colorPrimaryDark">@color/Background</item>
         <item name="android:windowBackground">@color/Background</item>
         <item name="android:textColorPrimary">@color/MainForeground</item>
-        <item name="contentInsetStart">0dp</item>
-        <item name="contentInsetEnd">0dp</item>
+    </style>
+
+    <style name="DialogTheme">
+        <item name="android:windowEnterAnimation">@anim/menu_enter</item>
+        <item name="android:windowExitAnimation">@anim/menu_exit</item>
+        <item name="colorPrimaryDark">@color/SecondBackground</item>
+        <item name="android:windowBackground">@color/SecondBackground</item>
+        <item name="android:textColorPrimary">@color/MainForeground</item>
     </style>
 
 </resources>

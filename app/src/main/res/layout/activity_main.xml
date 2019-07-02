@@ -8,24 +8,18 @@
     android:background="@color/Background"
     android:fitsSystemWindows="true"
     android:gravity="bottom"
-    tools:context=".MainActivity">
+    tools:context=".Activity.MainActivity">
 
-    <!--<android.support.design.widget.AppBarLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:backgroundTint="@color/colorBackground"-->
-    <!--android:theme="@style/AppTheme.AppBarOverlay">-->
-
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/toolbar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="?attr/actionBarSize"-->
-    <!--android:background="?attr/colorPrimary"-->
-    <!--app:popupTheme="@style/AppTheme.PopupOverlay" />-->
-
-    <!--</android.support.design.widget.AppBarLayout>-->
-
-    <!--<include layout="@layout/content_main" />-->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Background"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/AppTheme"
+        drawable:layout_constraintEnd_toEndOf="parent"
+        drawable:layout_constraintStart_toStartOf="parent"
+        drawable:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/main_space"
@@ -34,7 +28,7 @@
         drawable:layout_constraintBottom_toTopOf="@+id/bottom_bar"
         drawable:layout_constraintEnd_toEndOf="parent"
         drawable:layout_constraintStart_toStartOf="parent"
-        drawable:layout_constraintTop_toBottomOf="@+id/action_bar">
+        drawable:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <ScrollView
             android:id="@+id/track_list"
@@ -73,7 +67,7 @@
         <com.tessari.jamrec.CustomView.Beatsline
             android:id="@+id/beatsline"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="@dimen/beatsline_height"
             drawable:layout_constraintBottom_toTopOf="@+id/timeline"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintHorizontal_bias="0.0"
@@ -82,7 +76,7 @@
         <com.tessari.jamrec.CustomView.Timeline
             android:id="@+id/timeline"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="@dimen/timeline_height"
             drawable:layout_constraintBottom_toBottomOf="parent"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintHorizontal_bias="0.0"
@@ -133,32 +127,33 @@
             drawable:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/action_bar"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:background="@color/Background"
-        android:scrollbarSize="0dp"
-        android:scrollbarTrackVertical="@null"
-        android:visibility="visible"
-        drawable:layout_constraintEnd_toEndOf="parent"
-        drawable:layout_constraintStart_toStartOf="parent"
-        drawable:layout_constraintTop_toTopOf="parent">
+    <!--<android.support.constraint.ConstraintLayout-->
+        <!--android:id="@+id/action_bar"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="80dp"-->
+        <!--android:background="@color/Background"-->
+        <!--android:scrollbarSize="0dp"-->
+        <!--android:scrollbarTrackVertical="@null"-->
+        <!--android:visibility="visible"-->
+        <!--drawable:layout_constraintEnd_toEndOf="parent"-->
+        <!--drawable:layout_constraintStart_toStartOf="parent"-->
+        <!--drawable:layout_constraintTop_toTopOf="parent">-->
 
-        <Button
-            android:id="@+id/menu_button"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/menu_icon"
-            drawable:layout_constraintBottom_toBottomOf="parent"
-            drawable:layout_constraintStart_toStartOf="parent"
-            drawable:layout_constraintTop_toTopOf="parent" />
+        <!--<Button-->
+            <!--android:id="@+id/menu_button"-->
+            <!--android:layout_width="65dp"-->
+            <!--android:layout_height="65dp"-->
+            <!--android:layout_marginStart="8dp"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:background="@drawable/menu_icon"-->
+            <!--android:onClick="menuButtonOnClick"-->
+            <!--drawable:layout_constraintBottom_toBottomOf="parent"-->
+            <!--drawable:layout_constraintStart_toStartOf="parent"-->
+            <!--drawable:layout_constraintTop_toTopOf="parent" />-->
 
 
-    </android.support.constraint.ConstraintLayout>
+    <!--</android.support.constraint.ConstraintLayout>-->
 
 
 </android.support.constraint.ConstraintLayout>

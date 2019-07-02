@@ -3,4 +3,6 @@
     <item name="rec_button_pressed_scale" type="dimen" format="float">0.88</item>
     <item name="rec_button_enable_scale" type="dimen" format="float">1</item>
     <dimen name="layout_player_buttons_dim">70dp</dimen>
+    <dimen name="timeline_height">30dp</dimen>
+    <dimen name="beatsline_height">30dp</dimen>
 </resources>

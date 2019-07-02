@@ -1,5 +1,6 @@
 package com.tessari.jamrec;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -16,7 +17,7 @@ public class SessionManager {
     private ScaleGestureDetector stretchDetector;
     private GestureDetector scrollDetector, timebarScrollDetector, beatsbarScrollDetector;
 
-    private AppCompatActivity context;
+    private Activity context;
     private AudioCanvas audioCanvas;
     private Timeline timeline;
     private Beatsline beatsline;
@@ -30,7 +31,7 @@ public class SessionManager {
     private int offset = 0, trackViewWidth;
     public long millis = 0;
 
-    SessionManager(AppCompatActivity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
+    public SessionManager(Activity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
         this.context = context;
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
@@ -56,24 +57,39 @@ public class SessionManager {
             public void run() {
                 trackViewWidth = sampleRate * 15;
                 offset = trackViewWidth / 2 - sampleRate / 10;
+                updateCanvas();
             }
         });
     }
 
     public void updateCanvas() {
-        audioCanvas.invalidate();
-        timeline.invalidate();
-        beatsline.invalidate();
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                audioCanvas.invalidate();
+                timeline.invalidate();
+                beatsline.invalidate();
+            }
+        });
     }
 
     public void updateTimebar() {
-        timeline.invalidate();
-        beatsline.invalidate();
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                timeline.invalidate();
+                beatsline.invalidate();
+            }
+        });
     }
 
     public void startRec() {
-        recorder.startToRec();
-        button_rec.setChecked(true);
+        if (!isPlaying()) {
+            recorder.startToRec();
+            button_rec.setChecked(true);
+        }
+        else
+            button_rec.setChecked(false);
     }
 
     public void stopRec() {
