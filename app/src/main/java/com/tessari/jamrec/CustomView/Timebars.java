@@ -103,14 +103,42 @@ public class Timebars {
         }
     }
 
+
+    /**
+     * formatta il numero delle battute, battiti e quarti di battito
+     *
+     * ES. con tickPerBeat = 5 ovvero 5/4
+     *
+     * beat 1                       beat 2                         beat 3                        beat 4
+     *  │                             │                             │                             │
+     *  │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │
+     *  │                             │                             │                             │
+     * 1.1   1.2   1.3   1.4   1.5   2.1   2.2   2.3   2.4   2.5   3.1   3.2   3.3   3.4   3.5   4.1
+     *
+     * se subdivision < 1
+     *
+     * beat 1                                                                                                                  beat 2
+     * tick 1                  tick 2                  tick 3                  tick 4                  tick 5                  tick 6
+     *   │                       │                       │                       │                       │                       │
+     *   │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │     │
+     *   │                       │                       │                       │                       │                       │
+     * 1.1.1 1.1.2 1.1.3 1.1.4 1.2.1 1.2.2 1.2.3 1.2.4 1.3.1 1.3.2 1.3.3 1.3.4 1.4.1 1.4.2 1.4.3 1.4.4 1.5.1 1.5.2 1.5.3 1.5.4 1.6.1
+     *
+     * se subdivision > 1 viene stampato solo il numero di battute
+     *
+     * @param tick        battiti totali
+     * @param tickPerBeat numero di battiti in una battuta
+     * @param subdivision precisione dello zoom
+     * @return stringa formattata
+     */
     private String formatTick(double tick, int tickPerBeat, double subdivision) {
-        int beat = (int)(tick / tickPerBeat) + 1; // numero della battuta
+        int beat = (int) (tick / tickPerBeat) + 1; // numero della battuta
         if (tick % 1 == 0 && subdivision > 1)
             return "" + beat;
         else {
             String ret = "";
             if (tick % 0.25 == 0) { // limite di precisione ai quarti di tick
-                int tickInBeat = ((int)tick)%tickPerBeat + 1; // tick relativi alla battuta
+                int tickInBeat = ((int) tick) % tickPerBeat + 1; // tick relativi alla battuta
                 ret += beat + "." + tickInBeat;
                 if (subdivision < 1) {
                     tickInBeat = (int) (4 * (tick % 1) + 1); // quarti di tick
