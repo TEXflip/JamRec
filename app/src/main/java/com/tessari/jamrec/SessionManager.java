@@ -39,7 +39,7 @@ public class SessionManager {
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
-        metronome = new Metronome();
+        metronome = new Metronome(this);
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
         timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());

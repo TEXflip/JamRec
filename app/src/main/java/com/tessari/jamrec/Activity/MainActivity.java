@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.metronome:
-                MetronomeDialog md = new MetronomeDialog(this);
+                MetronomeDialog md = new MetronomeDialog(this,session.metronome);
                 md.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 md.show();
                 return true;
