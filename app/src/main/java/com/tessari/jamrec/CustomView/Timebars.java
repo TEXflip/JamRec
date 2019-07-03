@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
@@ -103,17 +104,17 @@ public class Timebars {
     }
 
     private String formatTick(double tick, int tickPerBeat, double subdivision) {
-        double beat = (tick / tickPerBeat) + 1;
+        int beat = (int)(tick / tickPerBeat) + 1; // numero della battuta
         if (tick % 1 == 0 && subdivision > 1)
-            return "" + (int) beat;
+            return "" + beat;
         else {
             String ret = "";
-            if (tick % 0.25 == 0) {
-                int div = (int) (tickPerBeat * (beat % 1) + 1);
-                ret += (int) beat + "." + div;
+            if (tick % 0.25 == 0) { // limite di precisione ai quarti di tick
+                int tickInBeat = ((int)tick)%tickPerBeat + 1; // tick relativi alla battuta
+                ret += beat + "." + tickInBeat;
                 if (subdivision < 1) {
-                    div = (int) (4 * (tick % 1) + 1);
-                    ret += "." + div;
+                    tickInBeat = (int) (4 * (tick % 1) + 1); // quarti di tick
+                    ret += "." + tickInBeat;
                 }
             }
             return ret;

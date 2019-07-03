@@ -1,5 +1,8 @@
 package com.tessari.jamrec.Util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Classe Math custom per aggiungere le funzioni non presenti nella min API
  */
@@ -38,5 +41,13 @@ public class SupportMath {
 
     public static boolean isBetween(float n, float min, float max){
         return n > min && n < max;
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
