@@ -4,8 +4,8 @@
     <color name="SecondBackground">#463535</color>
     <color name="Text">#DBCDC6</color>
     <color name="MainForeground">#DBCDC6</color>
-    <color name="MainForegroundPressed">#8F8581</color>
-    <color name="SecondForeground">#B0FE76</color>
+    <color name="MainForegroundPressed">#6d5d5d</color>
+    <color name="SecondForeground">#85c7bd</color>
     <color name="ThirdForeground">#81E979</color>
     <color name="Rec">#FF5858</color>
     <color name="RecPressed">#FD1717</color>

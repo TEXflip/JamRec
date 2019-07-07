@@ -32,17 +32,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textview_Bpm"
-        android:layout_width="56dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="20dp"
-        android:text="120"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_Bpm"
-        app:layout_constraintTop_toBottomOf="@+id/divider2" />
-
-    <TextView
         android:id="@+id/textview_Div"
         android:layout_width="56dp"
         android:layout_height="40dp"
@@ -76,35 +65,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekbar_Div" />
 
-    <SeekBar
-        android:id="@+id/seekbar_Bpm"
+    <!--<SeekBar-->
+        <!--android:id="@+id/seekbar_Bpm"-->
+        <!--android:layout_width="304dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+    <com.tessari.jamrec.CustomView.BPMSelector
+        android:id="@+id/bpm_selector"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="304dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="55dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginBottom="55dp"
-        android:text="Bpm:"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_Bpm" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginTop="40dp"
         android:rotation="90"
         android:text="|"
         android:textSize="36sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_Div" />
+        app:layout_constraintStart_toEndOf="@+id/seekbar_Div"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="132dp"
+        android:layout_marginBottom="48dp"
+        android:text="BPM:"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

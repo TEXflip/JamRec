@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.tessari.jamrec.CustomView.BPMSelector;
 import com.tessari.jamrec.Metronome;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.Util.SupportMath;
@@ -15,8 +16,9 @@ public class MetronomeDialog extends Dialog {
 
     private Activity context;
     private Metronome metronome;
-    private SeekBar seekbarTickPerBeat, seekbarDiv, seekbarBpm;
-    private TextView texviewTickPerBeat, texviewDiv, texviewBpm;
+    private SeekBar seekbarTickPerBeat, seekbarDiv;
+    private BPMSelector bpmSelector;
+    private TextView texviewTickPerBeat, texviewDiv;
 
     public MetronomeDialog(@NonNull Activity context, Metronome metronome) {
         super(context);
@@ -31,19 +33,17 @@ public class MetronomeDialog extends Dialog {
 
         seekbarTickPerBeat = findViewById(R.id.seekbar_tickPerBeat);
         seekbarDiv = findViewById(R.id.seekbar_Div);
-        seekbarBpm = findViewById(R.id.seekbar_Bpm);
+        bpmSelector = findViewById(R.id.bpm_selector);
+        //seekbarBpm = findViewById(R.id.seekbar_Bpm);
         texviewTickPerBeat = findViewById(R.id.textview_TickPerBeats);
         texviewDiv = findViewById(R.id.textview_Div);
-        texviewBpm = findViewById(R.id.textview_Bpm);
 
         seekbarTickPerBeat.setProgress(metronome.getTickPerBeat() - 1);
         texviewTickPerBeat.setText(String.valueOf(metronome.getTickPerBeat()));
-        int val = (int) Math.log(metronome.getDiv())+1;
+        int val = (int) Math.log(metronome.getDiv()) + 1;
         seekbarDiv.setProgress(val);
         texviewDiv.setText(String.valueOf(metronome.getDiv()));
-        val = (int) SupportMath.map(metronome.getBPM(), 20f, 400f, 0f, 100f);
-        seekbarBpm.setProgress(val);
-        texviewBpm.setText(String.valueOf(metronome.getBPM()));
+        bpmSelector.setBPM(metronome.getBPM());
 
         seekbarTickPerBeat.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -83,22 +83,10 @@ public class MetronomeDialog extends Dialog {
             }
         });
 
-        seekbarBpm.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        bpmSelector.setBpmChangeListener(new BPMSelector.OnBpmChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int val = (int) SupportMath.map(i, 0f, 100f, 20f, 400f); // 20 - 400
-                texviewBpm.setText(String.valueOf(val));
-                metronome.setBpm(val);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onBpmChanged(int bpm) {
+                metronome.setBpm(bpm);
             }
         });
     }
