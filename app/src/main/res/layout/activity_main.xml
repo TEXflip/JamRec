@@ -77,9 +77,17 @@
             android:id="@+id/timeline"
             android:layout_width="0dp"
             android:layout_height="@dimen/timeline_height"
-            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintBottom_toTopOf="@+id/metrnomeVisualizer"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintHorizontal_bias="0.0"
+            drawable:layout_constraintStart_toStartOf="parent" />
+
+        <com.tessari.jamrec.CustomView.MetrnomeVisualizer
+            android:id="@+id/metrnomeVisualizer"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            drawable:layout_constraintBottom_toBottomOf="parent"
+            drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>

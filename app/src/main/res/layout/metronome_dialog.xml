@@ -55,18 +55,6 @@
         app:layout_constraintStart_toEndOf="@+id/seekbar_tickPerBeat"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/divider2"
-        android:layout_width="395dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekbar_Div" />
-
     <!--<SeekBar-->
         <!--android:id="@+id/seekbar_Bpm"-->
         <!--android:layout_width="304dp"-->

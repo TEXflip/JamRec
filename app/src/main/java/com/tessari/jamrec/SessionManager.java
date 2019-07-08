@@ -9,6 +9,7 @@ import android.widget.ToggleButton;
 
 import com.tessari.jamrec.CustomView.AudioCanvas;
 import com.tessari.jamrec.CustomView.Beatsline;
+import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
 import com.tessari.jamrec.CustomView.Timeline;
 import com.tessari.jamrec.Util.SupportMath;
 
@@ -22,6 +23,7 @@ public class SessionManager {
     private Timeline timeline;
     private Beatsline beatsline;
     private ToggleButton button_rec, button_play;
+    private MetrnomeVisualizer metrnomeVisualizer;
     public Track track;
     public Recorder recorder;
     public Metronome metronome;
@@ -40,6 +42,7 @@ public class SessionManager {
         this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
         metronome = new Metronome(this);
+        metrnomeVisualizer = context.findViewById(R.id.metrnomeVisualizer);
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
         timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());
@@ -51,6 +54,7 @@ public class SessionManager {
         audioCanvas.setSession(this);
         timeline.setSession(this);
         beatsline.setSession(this);
+        metrnomeVisualizer.setMetronome(metronome);
         this.bufferSize = bufferSize;
         audioCanvas.post(new Runnable() {
             @Override
@@ -69,6 +73,7 @@ public class SessionManager {
                 audioCanvas.invalidate();
                 timeline.invalidate();
                 beatsline.invalidate();
+                metrnomeVisualizer.invalidate();
             }
         });
     }

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.tessari.jamrec.CustomView.BPMSelector;
 import com.tessari.jamrec.Metronome;
 import com.tessari.jamrec.R;
-import com.tessari.jamrec.Util.SupportMath;
 
 public class MetronomeDialog extends Dialog {
 

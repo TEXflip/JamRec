@@ -125,12 +125,4 @@ public class BPMSelector extends View {
     public void setBpmChangeListener(OnBpmChangeListener eventListener) {
         bpmListener = eventListener;
     }
-
-    public void setBpmFloat(float bpm){
-        bpmFloat = bpm;
-    }
-
-    public float getBpmFloat(){
-        return bpmFloat;
-    }
 }
