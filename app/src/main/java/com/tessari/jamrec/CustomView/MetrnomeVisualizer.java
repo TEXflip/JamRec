@@ -51,6 +51,6 @@ public class MetrnomeVisualizer extends View {
     }
 
     public void setCurrentTick(int currentTick) {
-        this.currentTick = currentTick;
+        this.currentTick = currentTick % tickPerBeat;
     }
 }

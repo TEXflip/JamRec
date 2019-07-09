@@ -71,6 +71,8 @@ public class Track {
                     else
                         trackSamples.set((recPos / bufferSize)-1, data);
                     data = new short[elem.length];
+                    if(trackListener != null)
+                        trackListener.onRecBufferIncrese(recPos);
                 }
                 data[recPos % bufferSize] = elem[i];
                 recPos++;
@@ -143,6 +145,7 @@ public class Track {
         void onPause();
         void onSync();
         void onPlayerBufferIncrease(int playerBufferPosition, int samplesRead);
+        void onRecBufferIncrese(int recBufferposition);
     }
 
     public void setTrackListener(TrackListener trackListener) {

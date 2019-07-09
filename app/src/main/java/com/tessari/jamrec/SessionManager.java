@@ -75,6 +75,14 @@ public class SessionManager {
             @Override
             public void onPlayerBufferIncrease(int playerBufferPosition, int samplesRead) {
                 updateViews();
+                int currTick = (int) metronome.fromSecToTicks(playerBufferPosition / (double) sampleRate);
+                metrnomeVisualizer.setCurrentTick(currTick);
+            }
+
+            @Override
+            public void onRecBufferIncrese(int recBufferposition) {
+                int currTick = (int) metronome.fromSecToTicks(recBufferposition / (double) sampleRate);
+                metrnomeVisualizer.setCurrentTick(currTick);
             }
         });
 
@@ -225,7 +233,7 @@ public class SessionManager {
         track.setPlayerBufferPos((int) (track.getPlayerBufferPos() + x * getViewsRatio()));
     }
 
-    void sumRecPos(float x){
+    void sumRecPos(float x) {
         track.setRecPos((int) (track.getRecPos() + x * getViewsRatio()));
     }
 
