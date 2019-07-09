@@ -23,7 +23,7 @@ public class BPMSelector extends View {
     private GestureDetector scrollDetector;
     private ValueAnimator choseBpmAnim = null;
     private Paint mainColor, rectColor, textColor;
-    private final int bpmMin = 40, bpmMax = 400;
+    private final int bpmMin = 20, bpmMax = 400;
     private int bpm = 120;
     private int nVisualized = 3; // numero di bpm visualizzati a destra e a sinistra
     private float bpmFloat = 119.5f;

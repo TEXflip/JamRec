@@ -44,7 +44,7 @@ public class Beatsline extends View {
             float PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), getWidth());
             c.drawLine(PBpos, getHeight(), PBpos, 0, blue);
             int CBpos = session.fromSamplesIndexToViewIndex(session.getRecBarPos(), getWidth());
-            c.drawRoundRect(CBpos - 30, 0, CBpos + 30, getHeight(), 25, 25, controlBarColor);
+            c.drawRoundRect(CBpos - 30, 0, CBpos + 30, getHeight(), 20, 20, controlBarColor);
         }
     }
 

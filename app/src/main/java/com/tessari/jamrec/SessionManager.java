@@ -1,7 +1,6 @@
 package com.tessari.jamrec;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -33,7 +32,7 @@ public class SessionManager {
     private int offset = 0, trackViewWidth;
     public long millis = 0;
 
-    public SessionManager(Activity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
+    public SessionManager(final Activity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
         this.context = context;
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
@@ -41,32 +40,81 @@ public class SessionManager {
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
-        metronome = new Metronome(this);
+        metronome = new Metronome();
         metrnomeVisualizer = context.findViewById(R.id.metrnomeVisualizer);
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
         timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());
         beatsbarScrollDetector = new GestureDetector(context, new BeatsbarScrollListener());
 
-        track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out, this);
-        recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in, this);
+        track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out);
+        recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in);
         audioCanvas.setTrack(track);
         audioCanvas.setSession(this);
         timeline.setSession(this);
         beatsline.setSession(this);
-        metrnomeVisualizer.setMetronome(metronome);
         this.bufferSize = bufferSize;
+
+        // LISTENERS
+        track.setTrackListener(new Track.TrackListener() {
+            @Override
+            public void onPause() {
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        button_play.setChecked(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onSync() {
+                syncTime = System.nanoTime() - startTime;
+            }
+
+            @Override
+            public void onPlayerBufferIncrease(int playerBufferPosition, int samplesRead) {
+                updateViews();
+            }
+        });
+
+        recorder.setNewBufferReadListener(new Recorder.OnNewBufferReadListener() {
+            @Override
+            public void onRead(short[] data) {
+                track.write(data);
+                updateViews();
+            }
+        });
+
+        metronome.setOnValueChangedListener(new Metronome.OnValueChangedListener() {
+            @Override
+            public void onTickPerBeatChanged(int tickPerBeat) {
+                metrnomeVisualizer.setTickPerBeat(tickPerBeat);
+                updateViews();
+            }
+
+            @Override
+            public void onBpmChanged(int bpm) {
+                updateViews();
+            }
+
+            @Override
+            public void onDivChanged(int div) {
+                updateViews();
+            }
+        });
+
         audioCanvas.post(new Runnable() {
             @Override
             public void run() {
                 trackViewWidth = sampleRate * 15;
                 offset = trackViewWidth / 2 - sampleRate / 10;
-                updateCanvas();
+                updateViews();
             }
         });
     }
 
-    public void updateCanvas() {
+    public void updateViews() {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -78,31 +126,22 @@ public class SessionManager {
         });
     }
 
-    public void updateTimebar() {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                timeline.invalidate();
-                beatsline.invalidate();
-            }
-        });
-    }
-
     public void startRec() {
         if (!isPlaying()) {
             recorder.startToRec();
+            startTime = System.nanoTime();
             button_rec.setChecked(true);
-        }
-        else
+        } else
             button_rec.setChecked(false);
     }
 
     public void stopRec() {
-        try {
-            recorder.stop();
-        } catch (InterruptedException e) {
+        //try {
+        recorder.stop();
+        track.syncActivation = true;
+        /*} catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         button_rec.setChecked(false);
     }
 
@@ -116,17 +155,11 @@ public class SessionManager {
 
     public void pausePlay() {
         track.pause();
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                button_play.setChecked(false); // questo perché pausePlay() viene chiamata dentro il PlayerThread
-            }
-        });
     }
 
     public void restartPlay() {
         track.resetPlay();
-        updateCanvas();
+        updateViews();
     }
 
     public boolean isRecording() {
@@ -157,7 +190,7 @@ public class SessionManager {
         return track.getPlayerBufferPos();
     }
 
-    public int getRecBarPos(){
+    public int getRecBarPos() {
         return track.recPos();
     }
 
@@ -176,7 +209,7 @@ public class SessionManager {
             trackViewWidth = audioCanvas.getWidth();
         else
             trackViewWidth -= x;
-        updateCanvas();
+        updateViews();
     }
 
     public void sumOffset(int x) {
@@ -185,7 +218,15 @@ public class SessionManager {
 
     public void sumOffsetNotRel(int x) {
         offset += x;
-        updateCanvas();
+        updateViews();
+    }
+
+    void sumPlayBarPos(float x) {
+        track.setPlayerBufferPos((int) (track.getPlayerBufferPos() + x * getViewsRatio()));
+    }
+
+    void sumRecPos(float x){
+        track.setRecPos((int) (track.getRecPos() + x * getViewsRatio()));
     }
 
     public int fromViewIndexToSamplesIndex(int i, int width) {
@@ -244,8 +285,8 @@ public class SessionManager {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isPlaying())
-                track.sumPlayBarPos(-distanceX);
-            updateCanvas();
+                sumPlayBarPos(-distanceX);
+            updateViews();
             return true;
         }
     }
@@ -254,8 +295,8 @@ public class SessionManager {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isRecording())
-                track.sumRecPos(-distanceX);
-            updateCanvas();
+                sumRecPos(-distanceX);
+            updateViews();
             return true;
         }
     }

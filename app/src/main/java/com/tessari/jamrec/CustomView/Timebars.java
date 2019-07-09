@@ -95,9 +95,8 @@ public class Timebars {
                 float div = (posXAfter - posX) / (float) session.metronome.getTickPerBeat();
                 for (int j = 1; j < session.metronome.getTickPerBeat(); j++)
                     c.drawRect(posX + (div * j) - halfTickness, 0, posX + (div * j) + halfTickness, halfHeight, linesColor);
-            } else {
+            } else
                 c.drawRect(posXhalf - halfTickness, 0, posXhalf + halfTickness, halfHeight, linesColor);
-            }
             if (showText && i >= 0)
                 c.drawText(formatTick(i, session.metronome.getTickPerBeat(), subdivision), posX, 60, textColor);
         }
@@ -132,7 +131,7 @@ public class Timebars {
      * @return stringa formattata
      */
     private String formatTick(double tick, int tickPerBeat, double subdivision) {
-        int beat = (int) (tick / tickPerBeat) + 1; // numero della battuta
+        int beat = (int) (tick / tickPerBeat) + 1; // numero della battuta (le battute si contano da 1)
         if (tick % 1 == 0 && subdivision > 1)
             return "" + beat;
         else {

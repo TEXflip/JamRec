@@ -2,13 +2,18 @@ package com.tessari.jamrec;
 
 public class Metronome {
 
+    private OnValueChangedListener valueListener;
     private int bpm = 120;
     private int tickPerBeat = 4;
     private int div = 4;
-    private SessionManager session;
 
-    public Metronome(SessionManager session) {
-        this.session = session;
+    public Metronome() {
+    }
+
+    public Metronome(int tickPerBeat, int div, int bpm) {
+        this.bpm = bpm;
+        this.tickPerBeat = tickPerBeat;
+        this.div = div;
     }
 
     public double fromSecToTicks(double sec) {
@@ -37,16 +42,29 @@ public class Metronome {
 
     public void setTickPerBeat(int tickPerBeat) {
         this.tickPerBeat = tickPerBeat;
-        session.updateCanvas();
+        if(valueListener != null)
+            valueListener.onTickPerBeatChanged(tickPerBeat);
     }
 
     public void setDiv(int div) {
         this.div = div;
-        session.updateCanvas();
+        if(valueListener != null)
+            valueListener.onDivChanged(div);
     }
 
     public void setBpm(int bpm) {
         this.bpm = bpm;
-        session.updateCanvas();
+        if(valueListener != null)
+            valueListener.onBpmChanged(bpm);
+    }
+
+    public interface OnValueChangedListener{
+        void onTickPerBeatChanged(int tickPerBeat);
+        void onBpmChanged(int bpm);
+        void onDivChanged(int div);
+    }
+
+    public void setOnValueChangedListener(OnValueChangedListener eventListener){
+        valueListener = eventListener;
     }
 }
