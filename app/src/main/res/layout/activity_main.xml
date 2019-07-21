@@ -85,7 +85,7 @@
         <com.tessari.jamrec.CustomView.MetrnomeVisualizer
             android:id="@+id/metrnomeVisualizer"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="@dimen/metronome_height"
             drawable:layout_constraintBottom_toBottomOf="parent"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent" />

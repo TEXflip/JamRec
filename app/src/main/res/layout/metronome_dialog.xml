@@ -3,97 +3,121 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/metronome_dialog"
-    android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:background="@drawable/card"
-    android:theme="@style/Theme.AppCompat" >
+    android:theme="@style/Theme.AppCompat">
 
     <SeekBar
         android:id="@+id/seekbar_Div"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="303dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
         android:max="3"
         android:progress="1"
+        app:layout_constraintEnd_toStartOf="@+id/textview_Div"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekbar_tickPerBeat" />
 
     <SeekBar
         android:id="@+id/seekbar_tickPerBeat"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="303dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
         android:max="15"
         android:progress="1"
+        app:layout_constraintEnd_toStartOf="@+id/textview_TickPerBeats"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/check_enable_metronome" />
 
     <TextView
         android:id="@+id/textview_Div"
-        android:layout_width="56dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginEnd="8dp"
         android:text="4"
         android:textAlignment="center"
         android:textColor="@color/Text"
         android:textSize="30sp"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_Div"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekbar_tickPerBeat" />
 
     <TextView
         android:id="@+id/textview_TickPerBeats"
-        android:layout_width="53dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
         android:text="4"
         android:textAlignment="center"
         android:textColor="@color/Text"
         android:textSize="30sp"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_tickPerBeat"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/seekbar_tickPerBeat" />
 
     <!--<SeekBar-->
-        <!--android:id="@+id/seekbar_Bpm"-->
-        <!--android:layout_width="304dp"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent" />-->
+    <!--android:id="@+id/seekbar_Bpm"-->
+    <!--android:layout_width="304dp"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:layout_marginBottom="16dp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent" />-->
     <com.tessari.jamrec.CustomView.BPMSelector
         android:id="@+id/bpm_selector"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="304dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="890px"
+        android:layout_height="120px"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekbar_Div" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="14dp"
         android:rotation="90"
         android:text="|"
         android:textColor="@color/Text"
         android:textSize="36sp"
-        app:layout_constraintStart_toEndOf="@+id/seekbar_Div"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/textview_Div"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="132dp"
-        android:layout_marginBottom="48dp"
+        android:gravity="center_horizontal"
         android:text="BPM:"
         android:textColor="@color/Text"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/bpm_selector"
+        app:layout_constraintEnd_toEndOf="@+id/bpm_selector"
+        app:layout_constraintStart_toStartOf="@+id/bpm_selector" />
+
+    <CheckBox
+        android:id="@+id/check_enable_metronome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:text="Show"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/check_enable_sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:checked="false"
+        android:text="Play Sound"
+        app:layout_constraintStart_toEndOf="@+id/check_enable_metronome"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

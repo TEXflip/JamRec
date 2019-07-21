@@ -1,6 +1,7 @@
 package com.tessari.jamrec;
 
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -29,7 +30,7 @@ public class SessionManager {
     long startTime, syncTime;
     private int bufferSize = 1024, sampleRate = 44100;
     private float pBPosFloat = 0;
-    private int offset = 0, trackViewWidth;
+    private int offset = 0, trackViewWidth, precTick = -1;
     public long millis = 0;
 
     public SessionManager(final Activity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
@@ -40,7 +41,7 @@ public class SessionManager {
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
-        metronome = new Metronome();
+        metronome = new Metronome(MediaPlayer.create(context, R.raw.metronome2), MediaPlayer.create(context, R.raw.metronome));
         metrnomeVisualizer = context.findViewById(R.id.metrnomeVisualizer);
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
@@ -77,12 +78,20 @@ public class SessionManager {
                 updateViews();
                 int currTick = (int) metronome.fromSecToTicks(playerBufferPosition / (double) sampleRate);
                 metrnomeVisualizer.setCurrentTick(currTick);
+                if (precTick != currTick) {
+                    metronome.tick(currTick);
+                    precTick = currTick;
+                }
             }
 
             @Override
             public void onRecBufferIncrese(int recBufferposition) {
                 int currTick = (int) metronome.fromSecToTicks(recBufferposition / (double) sampleRate);
                 metrnomeVisualizer.setCurrentTick(currTick);
+                if (precTick != currTick) {
+                    metronome.tick(currTick);
+                    precTick = currTick;
+                }
             }
         });
 

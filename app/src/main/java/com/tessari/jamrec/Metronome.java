@@ -1,13 +1,19 @@
 package com.tessari.jamrec;
 
+import android.media.MediaPlayer;
+
 public class Metronome {
 
     private OnValueChangedListener valueListener;
     private int bpm = 120;
     private int tickPerBeat = 4;
     private int div = 4;
+    private MediaPlayer tickPlayerUp, tickPlayer;
+    public boolean soundEnable = false;
 
-    public Metronome() {
+    public Metronome(MediaPlayer tickSoundUp, MediaPlayer tickSound) {
+        tickPlayerUp = tickSoundUp;
+        tickPlayer = tickSound;
     }
 
     public Metronome(int tickPerBeat, int div, int bpm) {
@@ -42,29 +48,39 @@ public class Metronome {
 
     public void setTickPerBeat(int tickPerBeat) {
         this.tickPerBeat = tickPerBeat;
-        if(valueListener != null)
+        if (valueListener != null)
             valueListener.onTickPerBeatChanged(tickPerBeat);
     }
 
     public void setDiv(int div) {
         this.div = div;
-        if(valueListener != null)
+        if (valueListener != null)
             valueListener.onDivChanged(div);
     }
 
     public void setBpm(int bpm) {
         this.bpm = bpm;
-        if(valueListener != null)
+        if (valueListener != null)
             valueListener.onBpmChanged(bpm);
     }
 
-    public interface OnValueChangedListener{
+    public interface OnValueChangedListener {
         void onTickPerBeatChanged(int tickPerBeat);
+
         void onBpmChanged(int bpm);
+
         void onDivChanged(int div);
     }
 
-    public void setOnValueChangedListener(OnValueChangedListener eventListener){
+    public void setOnValueChangedListener(OnValueChangedListener eventListener) {
         valueListener = eventListener;
+    }
+
+    public void tick(int currTick) {
+        if (soundEnable)
+            if (currTick % tickPerBeat == 0)
+                tickPlayerUp.start();
+            else
+                tickPlayer.start();
     }
 }
