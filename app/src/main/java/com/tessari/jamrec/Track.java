@@ -9,7 +9,7 @@ import java.util.Vector;
 
 public class Track {
 
-    short[] data;
+    private short[] data;
     private TrackListener trackListener;
     private Vector<short[]> trackSamples;
     private AudioTrack audioTrack;
@@ -115,6 +115,8 @@ public class Track {
         return recPos;
     }
 
+    public int getMaxRecPos(){ return maxRecPos; }
+
     void setRecordingPosition(int recPos) {
         this.recPos = recPos;
     }
@@ -150,5 +152,9 @@ public class Track {
 
     public void setTrackListener(TrackListener trackListener) {
         this.trackListener = trackListener;
+    }
+
+    public Vector<short[]> getTrackSamples(){
+        return trackSamples;
     }
 }

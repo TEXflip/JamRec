@@ -203,6 +203,10 @@ public class SessionManager {
         return sampleRate;
     }
 
+    public int getBufferSize() {
+        return bufferSize;
+    }
+
     public int getPlayBarPos() {
         return track.getPlayerBufferPos();
     }

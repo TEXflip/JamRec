@@ -10,17 +10,20 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
+import com.tessari.jamrec.Util.CustomToast;
+
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
     SessionManager session;
@@ -31,9 +34,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, permissions, 1);
 
         bufferSize = 1024; // AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out);
@@ -81,6 +86,14 @@ public class MainActivity extends AppCompatActivity {
                 md.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 md.show();
                 return true;
+            case R.id.export:
+                if (session.track.getMaxRecPos() < 1)
+                    CustomToast.showToast(this, getResources().getString(R.string.emptyTrackMessage));
+                else {
+                    ExportDialog ed = new ExportDialog(this, session);
+                    ed.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    ed.show();
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/metronome_dialog"
+    android:id="@+id/export_dialog"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
@@ -92,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="BPM:"
+        android:text="@string/metronome_bpm"
         android:textColor="@color/Text"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/bpm_selector"
@@ -106,7 +106,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:checked="true"
-        android:text="Show"
+        android:text="@string/metronome_show"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -117,7 +117,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:checked="false"
-        android:text="Play Sound"
+        android:text="@string/metronome_enable_sound"
         app:layout_constraintStart_toEndOf="@+id/check_enable_metronome"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

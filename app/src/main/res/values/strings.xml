@@ -3,6 +3,21 @@
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">JamRec</string>
+
     <string name="menu_metronome">Metronome</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_export">Export</string>
+
+    <string name="metronome_show">Show</string>
+    <string name="metronome_enable_sound">Sound</string>
+    <string name="metronome_bpm">BPM</string>
+
+    <string name="wav_format">WAV</string>
+    <string name="mp3_format">MP3</string>
+
+    <string name="button_export">Export</string>
+    <string name="codec">Choose Codec:</string>
+
+    <string name="emptyTrackMessage">The track is empty</string>
 </resources>

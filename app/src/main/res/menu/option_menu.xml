@@ -4,4 +4,10 @@
     <item
         android:id="@+id/metronome"
         android:title="@string/menu_metronome" />
+    <item
+        android:id="@+id/save"
+        android:title="@string/menu_save" />
+    <item
+        android:id="@+id/export"
+        android:title="@string/menu_export" />
 </menu>
