@@ -108,7 +108,7 @@ public class Track {
     }
 
     public int recPos() {
-        return SupportMath.floorMod(recPos, bufferSize);
+        return recPos > SupportMath.floorMod(maxRecPos, bufferSize) ? SupportMath.floorMod(maxRecPos, bufferSize) : recPos;
     }
 
     public int getRecPos() {
