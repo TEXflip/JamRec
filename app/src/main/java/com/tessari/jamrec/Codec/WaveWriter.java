@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-public class WaveWriter implements Progressable{
+public class WaveWriter{
     private final int LONGINT = 4;
     private final int SMALLINT = 2;
     private final int INTEGER = 4;
@@ -21,7 +21,6 @@ public class WaveWriter implements Progressable{
     short nChannels;
     Vector<short[]> data;
     byte[] output;
-    OnProgressChangedListener progressListener;
 
     public WaveWriter(int sampleRate, short nChannels, Vector<short[]> data, int bufferSize) {
         nSamples = bufferSize * data.size() + 1;
@@ -59,7 +58,6 @@ public class WaveWriter implements Progressable{
             short[] bufferData = data.get(v);
             for (int i = 0; i < bufferSize; i++)
                 write(bufferData[i]);
-            progressListener.onPorgressChanged((v+1)/(float)size);
         }
 
     }
@@ -92,10 +90,9 @@ public class WaveWriter implements Progressable{
         write((byte) (i & 0xFF));
     }
 
-    public boolean wroteToFile(String filename, File exportPath) {
+    public File wroteToFile(String filename, File exportPath) {
         buildHeader(sampleRate, nChannels);
         writeData(data, bufferSize);
-        boolean ok = false;
 
         try {
             File path = new File(exportPath, filename);
@@ -103,19 +100,13 @@ public class WaveWriter implements Progressable{
             outFile.write(output);
             outFile.flush();
             outFile.close();
-            ok = true;
+            return path;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            ok = false;
+            return null;
         } catch (IOException e) {
-            ok = false;
             e.printStackTrace();
+            return null;
         }
-        return ok;
-    }
-
-    @Override
-    public void setOnProgressChangedListener(OnProgressChangedListener listener) {
-        progressListener = listener;
     }
 }

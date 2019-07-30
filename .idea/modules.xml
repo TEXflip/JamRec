@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/com.github.adrielcafe/AndroidAudioConverter/0.0.8/0.0.8.iml" filepath="$PROJECT_DIR$/com.github.adrielcafe/AndroidAudioConverter/0.0.8/0.0.8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.github.adrielcafe/AndroidAudioConverter/AndroidAudioConverter.iml" filepath="$PROJECT_DIR$/com.github.adrielcafe/AndroidAudioConverter/AndroidAudioConverter.iml" />
       <module fileurl="file://$PROJECT_DIR$/JamRec.iml" filepath="$PROJECT_DIR$/JamRec.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.github.adrielcafe/com.github.adrielcafe.iml" filepath="$PROJECT_DIR$/com.github.adrielcafe/com.github.adrielcafe.iml" />
     </modules>
   </component>
 </project>

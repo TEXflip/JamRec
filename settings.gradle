@@ -1,1 +1,2 @@
 include ':app'
+include 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
