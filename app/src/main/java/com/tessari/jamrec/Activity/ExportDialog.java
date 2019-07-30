@@ -76,8 +76,6 @@ public class ExportDialog extends Dialog {
                 findViewById(R.id.radioButton_m4a).setEnabled(false);
                 findViewById(R.id.radioButton_wma).setEnabled(false);
                 findViewById(R.id.radioButton_mp3).setEnabled(false);
-                findViewById(R.id.radioButton_mp3).setSelected(false);
-                findViewById(R.id.radioButton_wav).setSelected(true);
             }
         });
 
@@ -87,6 +85,7 @@ public class ExportDialog extends Dialog {
             public void onClick(View view) {
                 findViewById(R.id.button_share).setVisibility(View.GONE);
                 progressExport.setVisibility(View.VISIBLE);
+
                 String filename = editTextFileName.getText().toString();
                 WaveWriter wave = new WaveWriter(session.getSampleRate(), (short) 1, session.track.getTrackSamples(), session.getBufferSize());
                 final File waveOutput = wave.wroteToFile(filename + ".wav", exportPath);
@@ -117,6 +116,14 @@ public class ExportDialog extends Dialog {
                 switch (radioGroupCodec.getCheckedRadioButtonId()) {
                     case R.id.radioButton_wav:
                         progressExport.setVisibility(View.GONE);
+                        Button buttonShare = findViewById(R.id.button_share);
+                        buttonShare.setVisibility(View.VISIBLE);
+                        buttonShare.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                share(waveOutput);
+                            }
+                        });
                         break;
                     case R.id.radioButton_mp3:
                         AndroidAudioConverter.with(getContext()).setFile(waveOutput).setFormat(AudioFormat.MP3).setCallback(callback).convert();
