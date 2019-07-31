@@ -16,14 +16,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Util.CustomToast;
-
-import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
     SessionManager session;
@@ -46,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         ((ScrollView) findViewById(R.id.track_list)).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                session.onTouchViewEvent(motionEvent);
+                session.onTouchAudioWavesEvent(motionEvent);
                 view.onTouchEvent(motionEvent);
                 return true;
             }

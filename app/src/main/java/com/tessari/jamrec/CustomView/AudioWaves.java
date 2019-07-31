@@ -9,34 +9,36 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.tessari.jamrec.CustomView.Timebars;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Track;
 
-public class AudioCanvas extends View {
+public class AudioWaves extends View {
 
 
-    private Paint wavesColor, controlBarColor, blue;
+    private Paint wavesPaint, recBarPaint, playerBarPaint, maxSizeBarPaint;
     private Track track = null;
     private SessionManager session = null;
     private int precSize = 0, valMax = 100;
     boolean autoMove = true;
     private Timebars lines;
 
-    public AudioCanvas(Context c, AttributeSet set) {
+    public AudioWaves(Context c, AttributeSet set) {
         super(c, set);
-        wavesColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-        wavesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
-        wavesColor.setStyle(Paint.Style.FILL);
-        controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-        controlBarColor.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
-        controlBarColor.setStyle(Paint.Style.FILL);
-        controlBarColor.setStrokeWidth(4);
-        blue = new Paint(Paint.ANTI_ALIAS_FLAG);
-        blue.setColor(Color.BLUE);
-        blue.setStyle(Paint.Style.FILL);
-        blue.setStrokeWidth(4);
+        wavesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        wavesPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
+        wavesPaint.setStyle(Paint.Style.FILL);
+        recBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        recBarPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
+        recBarPaint.setStyle(Paint.Style.FILL);
+        recBarPaint.setStrokeWidth(4);
+        playerBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        playerBarPaint.setColor(Color.BLUE);
+        playerBarPaint.setStyle(Paint.Style.FILL);
+        playerBarPaint.setStrokeWidth(4);
+        maxSizeBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        maxSizeBarPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
+        maxSizeBarPaint.setStrokeWidth(4);
     }
 
     @Override
@@ -49,27 +51,31 @@ public class AudioCanvas extends View {
             // disegna le barre del tempo
             lines.drawBeat(c, width, height, height);
 
-            int size = track == null ? 0 : track.recPos();
+            int recbarPos = track == null ? 0 : track.getVisualRecPos();
 
-            // se la recBar supera il 75% della schermata attiva l'automove
-            if (size > session.fromViewIndexToSamplesIndex((int) (width * 0.75), width) && autoMove)
-                session.sumOffsetNotRel(size - precSize);
+            // se la recBar supera l'80% della schermata attiva l'automove
+            if (recbarPos > session.fromViewIndexToSamplesIndex((int) (width * 0.80), width) && autoMove)
+                session.sumOffsetNotRel(recbarPos - precSize);
 
             //disegna l'onda dell'audio
             for (int i = 0; i < width; i++) {
                 float val = readNormalized(i);
-                c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesColor);
+                c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesPaint);
             }
 
+            // disegna la maxSizeBar
+            int MBpos = session.fromSamplesIndexToViewIndex(track.getVisualMaxRecPos(), width);
+            c.drawLine(MBpos, height, MBpos, 0, maxSizeBarPaint);
+
             // disegna la recBar
-            int CBpos = session.fromSamplesIndexToViewIndex(size, width);
-            c.drawLine(CBpos, height, CBpos, 0, controlBarColor);
+            int RBpos = session.fromSamplesIndexToViewIndex(recbarPos, width);
+            c.drawLine(RBpos, height, RBpos, 0, recBarPaint);
 
             // disegna la playBar
             int PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
-            c.drawLine(PBpos, height, PBpos, 0, blue);
+            c.drawLine(PBpos, height, PBpos, 0, playerBarPaint);
 
-            precSize = size;
+            precSize = recbarPos;
         }
     }
 
@@ -107,7 +113,7 @@ public class AudioCanvas extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        session.onTouchViewEvent(e);
+        session.onTouchAudioWavesEvent(e);
         return true;
     }
 

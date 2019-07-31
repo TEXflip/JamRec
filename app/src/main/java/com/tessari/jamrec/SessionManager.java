@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.ToggleButton;
 
-import com.tessari.jamrec.CustomView.AudioCanvas;
+import com.tessari.jamrec.CustomView.AudioWaves;
 import com.tessari.jamrec.CustomView.Beatsline;
 import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
 import com.tessari.jamrec.CustomView.Timeline;
@@ -19,7 +19,7 @@ public class SessionManager {
     private GestureDetector scrollDetector, timelineGestureDetector, beatslineGestureDetector, timebarLongPressDetector;
 
     private Activity context;
-    private AudioCanvas audioCanvas;
+    private AudioWaves audioWaves;
     private Timeline timeline;
     private Beatsline beatsline;
     private ToggleButton button_rec, button_play;
@@ -37,7 +37,7 @@ public class SessionManager {
         this.context = context;
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
-        this.audioCanvas = context.findViewById(R.id.audioCanvas);
+        this.audioWaves = context.findViewById(R.id.audioWaves);
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         this.sampleRate = sampleRate;
@@ -50,8 +50,8 @@ public class SessionManager {
 
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in);
-        audioCanvas.setTrack(track);
-        audioCanvas.setSession(this);
+        audioWaves.setTrack(track);
+        audioWaves.setSession(this);
         timeline.setSession(this);
         beatsline.setSession(this);
         this.bufferSize = bufferSize;
@@ -121,7 +121,7 @@ public class SessionManager {
             }
         });
 
-        audioCanvas.post(new Runnable() {
+        audioWaves.post(new Runnable() {
             @Override
             public void run() {
                 trackViewWidth = sampleRate * 15;
@@ -135,7 +135,7 @@ public class SessionManager {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                audioCanvas.invalidate();
+                audioWaves.invalidate();
                 timeline.invalidate();
                 beatsline.invalidate();
                 metrnomeVisualizer.invalidate();
@@ -153,12 +153,8 @@ public class SessionManager {
     }
 
     public void stopRec() {
-        //try {
         recorder.stop();
         track.syncActivation = true;
-        /*} catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         button_rec.setChecked(false);
     }
 
@@ -212,11 +208,11 @@ public class SessionManager {
     }
 
     public int getRecBarPos() {
-        return track.recPos();
+        return track.getVisualRecPos();
     }
 
     public float getViewsRatio() {
-        return ((float) trackViewWidth / (float) audioCanvas.getWidth());
+        return ((float) trackViewWidth / (float) audioWaves.getWidth());
     }
 
     /**
@@ -226,8 +222,8 @@ public class SessionManager {
      * @param x quantitá di zoom
      */
     public void sumTrackViewWidth(double x) {
-        if (trackViewWidth - x < audioCanvas.getWidth())
-            trackViewWidth = audioCanvas.getWidth();
+        if (trackViewWidth - x < audioWaves.getWidth())
+            trackViewWidth = audioWaves.getWidth();
         else
             trackViewWidth -= x;
         updateViews();
@@ -272,7 +268,7 @@ public class SessionManager {
         return (int) (((i - start1) / trackViewWidth) * width);
     }
 
-    public void onTouchViewEvent(MotionEvent e) {
+    public void onTouchAudioWavesEvent(MotionEvent e) {
         scrollDetector.onTouchEvent(e);
         stretchDetector.onTouchEvent(e);
     }

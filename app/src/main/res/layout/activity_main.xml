@@ -46,8 +46,8 @@
                 android:contextClickable="true"
                 android:isScrollContainer="true">
 
-                <com.tessari.jamrec.CustomView.AudioCanvas
-                    android:id="@+id/audioCanvas"
+                <com.tessari.jamrec.CustomView.AudioWaves
+                    android:id="@+id/audioWaves"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
                     drawable:layout_constraintBottom_toBottomOf="parent"
@@ -60,7 +60,7 @@
                     <!--android:layout_width="match_parent"-->
                     <!--android:layout_height="wrap_content"-->
                     <!--android:orientation="vertical" />-->
-                </com.tessari.jamrec.CustomView.AudioCanvas>
+                </com.tessari.jamrec.CustomView.AudioWaves>
             </android.support.constraint.ConstraintLayout>
         </ScrollView>
 

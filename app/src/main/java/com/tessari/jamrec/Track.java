@@ -107,8 +107,12 @@ public class Track {
         }
     }
 
-    public int recPos() {
+    public int getVisualRecPos() {
         return recPos > SupportMath.floorMod(maxRecPos, bufferSize) ? SupportMath.floorMod(maxRecPos, bufferSize) : recPos;
+    }
+
+    public int getVisualMaxRecPos(){
+        return SupportMath.floorMod(maxRecPos, bufferSize);
     }
 
     public int getRecPos() {
