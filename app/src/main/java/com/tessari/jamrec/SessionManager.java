@@ -16,7 +16,7 @@ import com.tessari.jamrec.Util.SupportMath;
 public class SessionManager {
 
     private ScaleGestureDetector stretchDetector;
-    private GestureDetector scrollDetector, timebarScrollDetector, beatsbarScrollDetector;
+    private GestureDetector scrollDetector, timelineGestureDetector, beatslineGestureDetector, timebarLongPressDetector;
 
     private Activity context;
     private AudioCanvas audioCanvas;
@@ -45,8 +45,8 @@ public class SessionManager {
         metrnomeVisualizer = context.findViewById(R.id.metrnomeVisualizer);
         stretchDetector = new ScaleGestureDetector(context, new ViewStretchListener());
         scrollDetector = new GestureDetector(context, new ViewScrollListener());
-        timebarScrollDetector = new GestureDetector(context, new TimebarScrollListener());
-        beatsbarScrollDetector = new GestureDetector(context, new BeatsbarScrollListener());
+        timelineGestureDetector = new GestureDetector(context, new TimelineGestureListener());
+        beatslineGestureDetector = new GestureDetector(context, new BeatslineGestureListener());
 
         track = new Track(sampleRate, bufferSize, audio_encoding, audio_channel_out);
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in);
@@ -278,11 +278,11 @@ public class SessionManager {
     }
 
     public void onTouchTimebarEvent(MotionEvent e) {
-        timebarScrollDetector.onTouchEvent(e);
+        timelineGestureDetector.onTouchEvent(e);
     }
 
     public void onTouchBeatsbarEvent(MotionEvent e) {
-        beatsbarScrollDetector.onTouchEvent(e);
+        beatslineGestureDetector.onTouchEvent(e);
     }
 
     public class ViewStretchListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -302,7 +302,7 @@ public class SessionManager {
         }
     }
 
-    public class TimebarScrollListener extends GestureDetector.SimpleOnGestureListener {
+    public class TimelineGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isPlaying())
@@ -310,13 +310,29 @@ public class SessionManager {
             updateViews();
             return true;
         }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (!isPlaying())
+                track.setPlayerBufferPos(fromViewIndexToSamplesIndex((int) e.getX(), timeline.getWidth()));
+            updateViews();
+            return true;
+        }
     }
 
-    public class BeatsbarScrollListener extends GestureDetector.SimpleOnGestureListener {
+    public class BeatslineGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (!isRecording())
                 sumRecPos(-distanceX);
+            updateViews();
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (!isRecording())
+                track.setRecPos(fromViewIndexToSamplesIndex((int) e.getX(), beatsline.getWidth()));
             updateViews();
             return true;
         }
