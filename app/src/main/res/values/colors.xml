@@ -6,9 +6,10 @@
     <color name="MainForeground">#DBCDC6</color>
     <color name="MainForegroundPressed">#6d5d5d</color>
     <color name="SecondForeground">#85c7bd</color>
-    <color name="ThirdForeground">#81E979</color>
+    <color name="Player">#002FFF</color>
     <color name="Rec">#FF5858</color>
     <color name="RecPressed">#FD1717</color>
+    <color name="Selection">#4DDBCDC6</color>
 
     <!--<color name="ForegroundOverlay">#EEDBCDC6</color>-->
     <color name="white">#FFFFFF</color>

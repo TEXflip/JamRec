@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
 
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;

@@ -2,11 +2,9 @@ package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.tessari.jamrec.R;
@@ -23,7 +21,7 @@ public class Timeline extends View {
         linesColor.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
         linesColor.setStyle(Paint.Style.FILL);
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
-        blue.setColor(Color.BLUE);
+        blue.setColor(ResourcesCompat.getColor(getResources(), R.color.Player, null));
         blue.setAlpha(150);
         blue.setStyle(Paint.Style.FILL);
     }
@@ -37,12 +35,6 @@ public class Timeline extends View {
             float PBpos = session.fromSamplesIndexToViewIndex(session.getPlayBarPos(), width);
             c.drawRoundRect(PBpos - 30, 0, PBpos + 30, height, 20, 20, blue);
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        session.onTouchTimebarEvent(e);
-        return true;
     }
 
     public void setSession(SessionManager session) {

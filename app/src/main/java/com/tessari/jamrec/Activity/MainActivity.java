@@ -1,6 +1,7 @@
 package com.tessari.jamrec.Activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ScrollView;
 
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     SessionManager session;
     int bufferSize, sampleRate = 44100, audio_encoding = AudioFormat.ENCODING_PCM_16BIT, audio_channel_in = AudioFormat.CHANNEL_IN_MONO, audio_channel_out = AudioFormat.CHANNEL_OUT_MONO;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         bufferSize = 1024; // AudioRecord.getMinBufferSize(sampleRate, audio_channel_in, audio_encoding);
         session = new SessionManager(this, sampleRate, bufferSize, audio_encoding, audio_channel_in, audio_channel_out);
 
-        ((ScrollView) findViewById(R.id.track_list)).setOnTouchListener(new View.OnTouchListener() {
+        findViewById(R.id.track_list).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                session.onTouchAudioWavesEvent(motionEvent);
+                session.gestureManager.onTouchAudioWavesEvent(motionEvent);
                 view.onTouchEvent(motionEvent);
                 return true;
             }

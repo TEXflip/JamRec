@@ -2,11 +2,9 @@ package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.tessari.jamrec.R;
@@ -16,29 +14,30 @@ import com.tessari.jamrec.Track;
 public class AudioWaves extends View {
 
 
-    private Paint wavesPaint, recBarPaint, playerBarPaint, maxSizeBarPaint;
+    private Paint wavesPaint, recBarPaint, playerBarPaint, maxSizeBarPaint, selectionPaint;
     private Track track = null;
     private SessionManager session = null;
     private int precSize = 0, valMax = 100;
-    boolean autoMove = true;
+    private int selectionStart = 0, selectionEnd = 0;
+    boolean autoMove = true, selectionEnable = false;
     private Timebars lines;
 
     public AudioWaves(Context c, AttributeSet set) {
         super(c, set);
         wavesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         wavesPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.MainForeground, null));
-        wavesPaint.setStyle(Paint.Style.FILL);
         recBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         recBarPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.Rec, null));
-        recBarPaint.setStyle(Paint.Style.FILL);
         recBarPaint.setStrokeWidth(4);
         playerBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        playerBarPaint.setColor(Color.BLUE);
-        playerBarPaint.setStyle(Paint.Style.FILL);
+        playerBarPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.Player, null));
         playerBarPaint.setStrokeWidth(4);
         maxSizeBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         maxSizeBarPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.SecondBackground, null));
         maxSizeBarPaint.setStrokeWidth(4);
+        selectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        selectionPaint.setColor(ResourcesCompat.getColor(getResources(), R.color.Selection, null));
+        selectionPaint.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -57,11 +56,15 @@ public class AudioWaves extends View {
             if (recbarPos > session.fromViewIndexToSamplesIndex((int) (width * 0.80), width) && autoMove)
                 session.sumOffsetNotRel(recbarPos - precSize);
 
-            //disegna l'onda dell'audio
+            // disegna l'onda dell'audio
             for (int i = 0; i < width; i++) {
                 float val = readNormalized(i);
                 c.drawLine(i, height / 2f + val, i, height / 2f + 1 - val, wavesPaint);
             }
+
+            // disegna la selection area
+            if(selectionEnable)
+                c.drawRoundRect(selectionStart, 0, selectionEnd, height, 5, 5, selectionPaint);
 
             // disegna la maxSizeBar
             int MBpos = session.fromSamplesIndexToViewIndex(track.getVisualMaxRecPos(), width);
@@ -111,14 +114,18 @@ public class AudioWaves extends View {
         return val;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        session.onTouchAudioWavesEvent(e);
-        return true;
-    }
-
     public void setTrack(Track t) {
         track = t;
+    }
+
+    public void setSelectionArea(int start, int end){
+        selectionStart = start;
+        selectionEnd = end;
+        selectionEnable = true;
+    }
+
+    public void deselect(){
+        selectionEnable = false;
     }
 
     public void setSession(SessionManager session) {

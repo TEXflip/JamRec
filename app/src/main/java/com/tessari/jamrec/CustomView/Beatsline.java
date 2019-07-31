@@ -27,7 +27,7 @@ public class Beatsline extends View {
         linesColor.setStyle(Paint.Style.FILL);
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
         blue = new Paint(Paint.ANTI_ALIAS_FLAG);
-        blue.setColor(Color.BLUE);
+        blue.setColor(ResourcesCompat.getColor(getResources(), R.color.Player, null));
         blue.setStyle(Paint.Style.FILL);
         blue.setStrokeWidth(4);
         controlBarColor = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -46,12 +46,6 @@ public class Beatsline extends View {
             int CBpos = session.fromSamplesIndexToViewIndex(session.getRecBarPos(), getWidth());
             c.drawRoundRect(CBpos - 30, 0, CBpos + 30, getHeight(), 20, 20, controlBarColor);
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        session.onTouchBeatsbarEvent(e);
-        return true;
     }
 
     public void setSession(SessionManager session) {
