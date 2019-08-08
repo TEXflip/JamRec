@@ -13,7 +13,7 @@ public class SessionGestureManager {
     private boolean selectionMode = false;
     private int selectionStart = 0;
 
-    public SessionGestureManager(SessionManager session, Context context){
+    public SessionGestureManager(SessionManager session, Context context) {
         this.session = session;
 
         // Gesture detectors
@@ -26,11 +26,11 @@ public class SessionGestureManager {
     public void onTouchAudioWavesEvent(MotionEvent e) {
         audioWavesGestureDetector.onTouchEvent(e);
         audioWavesScaleDetector.onTouchEvent(e);
-        if(e.getAction() == MotionEvent.ACTION_UP) {
+        int endInSamples = session.fromViewIndexToSamplesIndex((int) e.getX(), session.audioWaves.getWidth());
+        if (e.getAction() == MotionEvent.ACTION_UP) {
             selectionMode = false;
             session.audioWaves.deselect();
-        }
-        else if(selectionMode && e.getAction() == MotionEvent.ACTION_MOVE) {
+        } else if (selectionMode && e.getAction() == MotionEvent.ACTION_MOVE && endInSamples >= 0 && endInSamples < session.track.getVisualMaxRecPos()) {
             session.audioWaves.setSelectionArea(selectionStart, (int) e.getX());
             session.updateViews();
         }
@@ -47,8 +47,10 @@ public class SessionGestureManager {
     public class AudioWavesScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            double f = scaleGestureDetector.getScaleFactor() - 1;
-            session.sumTrackViewWidth(f * session.trackViewWidth * 2);
+            if (!selectionMode) {
+                double f = scaleGestureDetector.getScaleFactor() - 1;
+                session.sumTrackViewWidth(f * session.trackViewWidth * 2);
+            }
             return true;
         }
     }
@@ -57,14 +59,18 @@ public class SessionGestureManager {
 
         @Override
         public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-            session.sumOffset(v);
+            if (!selectionMode)
+                session.sumOffset(v);
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            selectionStart = (int)e.getX();
-            selectionMode = true;
+
+            selectionStart = (int) e.getX();
+            int startInSamples = session.fromViewIndexToSamplesIndex(selectionStart, session.audioWaves.getWidth());
+            if (startInSamples >= 0 && startInSamples < session.track.getVisualMaxRecPos())
+                selectionMode = true;
         }
     }
 
