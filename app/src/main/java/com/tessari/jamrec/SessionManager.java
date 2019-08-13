@@ -17,7 +17,7 @@ public class SessionManager {
     public SessionGestureManager gestureManager;
 
     private Activity context;
-    AudioWaves audioWaves;
+    public AudioWaves audioWaves;
     Timeline timeline;
     Beatsline beatsline;
     private ToggleButton button_rec, button_play;

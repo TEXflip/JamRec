@@ -30,6 +30,17 @@ public class Track {
         data = new short[bufferSize];
     }
 
+    void silence(int from, int to) {
+        if (!isPlaying)
+            for (int i = from; i < to; i++) {
+                trackSamples.get((i / bufferSize) - 1)[i % bufferSize] = 0;
+            }
+    }
+
+    void delete(int from, int to) {
+
+    }
+
     void play() {
         audioTrack.play();
         playerThread = new PlayerThread();
@@ -41,7 +52,7 @@ public class Track {
         isPlaying = false; // prima cosa da fare o audioTrack.write() non blocca
         audioTrack.stop();
         playerThread = null;
-        if(trackListener != null)
+        if (trackListener != null)
             trackListener.onPause();
     }
 
@@ -60,7 +71,7 @@ public class Track {
             if (syncActivation) {
                 if (Math.abs(elem[i]) > 3) {
                     syncActivation = false;
-                    if(trackListener != null)
+                    if (trackListener != null)
                         trackListener.onSync();
                 }
             }
@@ -69,14 +80,14 @@ public class Track {
                     if (trackSamples.size() <= (recPos / bufferSize) - 1)
                         trackSamples.add(data);
                     else
-                        trackSamples.set((recPos / bufferSize)-1, data);
+                        trackSamples.set((recPos / bufferSize) - 1, data);
                     data = new short[elem.length];
-                    if(trackListener != null)
+                    if (trackListener != null)
                         trackListener.onRecBufferIncrese(recPos);
                 }
                 data[recPos % bufferSize] = elem[i];
                 recPos++;
-                if(recPos > maxRecPos)
+                if (recPos > maxRecPos)
                     maxRecPos = recPos;
             }
         }
@@ -101,7 +112,7 @@ public class Track {
                         bufferSize - samplesOffset,
                         AudioTrack.WRITE_BLOCKING);
                 playerBufferPos += NsamplesRead;
-                if(trackListener != null)
+                if (trackListener != null)
                     trackListener.onPlayerBufferIncrease(playerBufferPos, NsamplesRead);
             }
         }
@@ -111,7 +122,7 @@ public class Track {
         return recPos > SupportMath.floorMod(maxRecPos, bufferSize) ? SupportMath.floorMod(maxRecPos, bufferSize) : recPos;
     }
 
-    public int getVisualMaxRecPos(){
+    public int getVisualMaxRecPos() {
         return SupportMath.floorMod(maxRecPos, bufferSize);
     }
 
@@ -119,7 +130,9 @@ public class Track {
         return recPos;
     }
 
-    public int getMaxRecPos(){ return maxRecPos; }
+    public int getMaxRecPos() {
+        return maxRecPos;
+    }
 
     void setRecordingPosition(int recPos) {
         this.recPos = recPos;
@@ -129,10 +142,10 @@ public class Track {
         return playerBufferPos;
     }
 
-    public void setRecPos(int x){
-        if(x >= maxRecPos)
+    public void setRecPos(int x) {
+        if (x >= maxRecPos)
             recPos = maxRecPos;
-        else if(x <= 0)
+        else if (x <= 0)
             recPos = 0;
         else
             recPos = x;
@@ -149,8 +162,11 @@ public class Track {
 
     public interface TrackListener {
         void onPause();
+
         void onSync();
+
         void onPlayerBufferIncrease(int playerBufferPosition, int samplesRead);
+
         void onRecBufferIncrese(int recBufferposition);
     }
 
@@ -158,7 +174,7 @@ public class Track {
         this.trackListener = trackListener;
     }
 
-    public Vector<short[]> getTrackSamples(){
+    public Vector<short[]> getTrackSamples() {
         return trackSamples;
     }
 }

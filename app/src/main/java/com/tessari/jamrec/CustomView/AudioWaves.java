@@ -126,6 +126,7 @@ public class AudioWaves extends View {
 
     public void deselect(){
         selectionEnable = false;
+        invalidate();
     }
 
     public void setSession(SessionManager session) {

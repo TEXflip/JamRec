@@ -1,19 +1,23 @@
 package com.tessari.jamrec;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+
+import com.tessari.jamrec.Activity.SelectionDialog;
 
 public class SessionGestureManager {
     SessionManager session;
 
     private ScaleGestureDetector audioWavesScaleDetector;
     private GestureDetector audioWavesGestureDetector, timelineGestureDetector, beatslineGestureDetector;
+    private SelectionDialog selectionDialog;
     private boolean selectionMode = false;
-    private int selectionStart = 0;
+    private int selectionStart = 0, selectionEnd = 0;
 
-    public SessionGestureManager(SessionManager session, Context context) {
+    public SessionGestureManager(final SessionManager session, Context context) {
         this.session = session;
 
         // Gesture detectors
@@ -21,19 +25,41 @@ public class SessionGestureManager {
         audioWavesGestureDetector = new GestureDetector(context, new AudioWavesGestureListener());
         timelineGestureDetector = new GestureDetector(context, new TimelineGestureListener());
         beatslineGestureDetector = new GestureDetector(context, new BeatslineGestureListener());
+        selectionDialog = new SelectionDialog(context, session);
+        selectionDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                session.audioWaves.deselect();
+            }
+        });
+        selectionDialog.setOnDeleteListener(new SelectionDialog.OnDeleteListener() {
+            @Override
+            public void onDelete(boolean sawTheEnds) {
+                int startIndex = session.fromViewIndexToSamplesIndex(selectionStart, session.audioWaves.getWidth());
+                int endIndex = session.fromViewIndexToSamplesIndex(selectionEnd, session.audioWaves.getWidth());
+                if(sawTheEnds)
+                    session.track.delete(startIndex, endIndex);
+                else
+                    session.track.silence(startIndex, endIndex);
+                session.audioWaves.deselect();
+            }
+        });
     }
 
     public void onTouchAudioWavesEvent(MotionEvent e) {
         audioWavesGestureDetector.onTouchEvent(e);
         audioWavesScaleDetector.onTouchEvent(e);
         int endInSamples = session.fromViewIndexToSamplesIndex((int) e.getX(), session.audioWaves.getWidth());
-        if (e.getAction() == MotionEvent.ACTION_UP) {
-            selectionMode = false;
-            session.audioWaves.deselect();
-        } else if (selectionMode && e.getAction() == MotionEvent.ACTION_MOVE && endInSamples >= 0 && endInSamples < session.track.getVisualMaxRecPos()) {
-            session.audioWaves.setSelectionArea(selectionStart, (int) e.getX());
-            session.updateViews();
-        }
+        if (selectionMode)
+            if (e.getAction() == MotionEvent.ACTION_UP) {
+                selectionMode = false;
+                selectionDialog.show();
+            } else if (e.getAction() == MotionEvent.ACTION_MOVE && endInSamples >= 0 && endInSamples < session.track.getVisualMaxRecPos()) {
+                selectionEnd = (int) e.getX();
+                session.audioWaves.setSelectionArea(selectionStart, selectionEnd);
+                session.updateViews();
+            }
+
     }
 
     public void onTouchTimebarEvent(MotionEvent e) {

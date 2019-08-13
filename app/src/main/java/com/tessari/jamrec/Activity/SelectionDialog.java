@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -30,6 +31,7 @@ import cafe.adriel.androidaudioconverter.model.AudioFormat;
 
 public class SelectionDialog extends Dialog {
     private SessionManager session;
+    OnDeleteListener deleteListener;
 
     public SelectionDialog(@NonNull Context context, SessionManager session) {
         super(context);
@@ -39,7 +41,25 @@ public class SelectionDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.selection_dialog);
+        final CheckBox checkBoxSawTheEnds = findViewById(R.id.checkBox_sew_the_ends);
 
+        findViewById(R.id.button_delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(deleteListener != null)
+                    deleteListener.onDelete(checkBoxSawTheEnds.isChecked());
+                dismiss();
+            }
+        });
+    }
+
+    public void setOnDeleteListener(OnDeleteListener listener){
+        deleteListener = listener;
+    }
+
+    public interface OnDeleteListener{
+        void onDelete(boolean sewTheEnds);
     }
 
 }
