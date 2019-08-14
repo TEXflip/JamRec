@@ -30,15 +30,37 @@ public class Track {
         data = new short[bufferSize];
     }
 
-    void silence(int from, int to) {
+    public void resetAudio() {
+        trackSamples = new Vector<>();
+        data = new short[bufferSize];
+        playerBufferPos = recPos = maxRecPos = 0;
+        if (trackListener != null)
+            trackListener.onResetAudio();
+    }
+
+    void silence(int from, int to) { //forse ottimizzabile con 2 for, uno per il Vector e uno per l'array
         if (!isPlaying)
-            for (int i = from; i < to; i++) {
+            for (int i = from; i < to; i++)
                 trackSamples.get((i / bufferSize) - 1)[i % bufferSize] = 0;
-            }
+        if (trackListener != null)
+            trackListener.onDelete();
     }
 
     void delete(int from, int to) {
-
+        int diff = to - from;
+        if (!isPlaying)
+            for (int i = from; i < maxRecPos; i++) {
+                short val = i + diff < maxRecPos ?
+                        trackSamples.get(((i + diff) / bufferSize) - 1)[(i + diff) % bufferSize] : 0;
+                trackSamples.get((i / bufferSize) - 1)[i % bufferSize] = val;
+            }
+        maxRecPos -= diff;
+        if (playerBufferPos > maxRecPos)
+            playerBufferPos = maxRecPos;
+        if (recPos > maxRecPos)
+            recPos = maxRecPos;
+        if (trackListener != null)
+            trackListener.onDelete();
     }
 
     void play() {
@@ -161,6 +183,10 @@ public class Track {
     }
 
     public interface TrackListener {
+        void onDelete();
+
+        void onResetAudio();
+
         void onPause();
 
         void onSync();

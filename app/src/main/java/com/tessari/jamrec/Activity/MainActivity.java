@@ -91,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
                     ed.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     ed.show();
                 }
+                return true;
+            case R.id.reset:
+                session.stopRec();
+                session.pausePlay();
+                session.track.resetAudio();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -76,6 +76,16 @@ public class SessionManager {
 
         track.setTrackListener(new Track.TrackListener() {
             @Override
+            public void onDelete() {
+                updateViews();
+            }
+
+            @Override
+            public void onResetAudio() {
+                updateViews();
+            }
+
+            @Override
             public void onPause() {
                 context.runOnUiThread(new Runnable() {
                     @Override

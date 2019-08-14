@@ -6,6 +6,7 @@
     <string name="title_activity_main">JamRec</string>
 
     <string name="menu_metronome">Metronome</string>
+    <string name="menu_reset">Clean Track</string>
     <string name="menu_save">Save</string>
     <string name="menu_export">Export</string>
 
