@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 session.pausePlay();
                 session.track.resetAudio();
                 return true;
+            case R.id.save:
+                session.saveSession();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

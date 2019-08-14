@@ -3,18 +3,20 @@ package com.tessari.jamrec;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
+import com.tessari.jamrec.Save.Savable;
+import com.tessari.jamrec.Save.TrackSave;
 import com.tessari.jamrec.Util.SupportMath;
 
 import java.util.Vector;
 
-public class Track {
+public class Track implements Savable<TrackSave> {
 
     private short[] data;
     private TrackListener trackListener;
     private Vector<short[]> trackSamples;
     private AudioTrack audioTrack;
     private PlayerThread playerThread;
-    private int bufferSize, playerBufferPos = 0, recPos = 0, maxRecPos = 0;
+    private int bufferSize, playerBufferPos = 0, recPos = 0, maxRecPos = 0, audio_encoding, audio_channel_out, sampleRate;
     private boolean isPlaying = false;
     boolean syncActivation = true;
 
@@ -23,6 +25,9 @@ public class Track {
 
         trackSamples = new Vector<>();
         this.bufferSize = bufferSize;
+        this.audio_encoding = audio_encoding;
+        this.audio_channel_out = audio_channel_out;
+        this.sampleRate = sampleRate;
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
                 audio_channel_out,
                 audio_encoding, bufferSize,
@@ -202,5 +207,39 @@ public class Track {
 
     public Vector<short[]> getTrackSamples() {
         return trackSamples;
+    }
+
+    @Override
+    public String getName() {
+        return "track";
+    }
+
+    @Override
+    public TrackSave save() {
+        TrackSave save = new TrackSave();
+        save.setTrackSamples(trackSamples);
+        save.setData(data);
+        save.setMaxRecPos(maxRecPos);
+        save.setBufferSize(bufferSize);
+        save.setSampleRate(sampleRate);
+        save.setAudio_encoding(audio_encoding);
+        save.setAudio_channel_out(audio_channel_out);
+        return save;
+    }
+
+    @Override
+    public void restore(TrackSave restoreObject) {
+        pause();
+        trackSamples = restoreObject.getTrackSamples();
+        maxRecPos = restoreObject.getMaxRecPos();
+        data = restoreObject.getData();
+        bufferSize = restoreObject.getBufferSize();
+        sampleRate = restoreObject.getSampleRate();
+        audio_encoding = restoreObject.getAudio_encoding();
+        audio_channel_out = restoreObject.getAudio_channel_out();
+        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
+                audio_channel_out,
+                audio_encoding, bufferSize,
+                AudioTrack.MODE_STREAM);
     }
 }

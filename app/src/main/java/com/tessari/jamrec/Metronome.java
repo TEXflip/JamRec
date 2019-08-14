@@ -2,7 +2,10 @@ package com.tessari.jamrec;
 
 import android.media.MediaPlayer;
 
-public class Metronome {
+import com.tessari.jamrec.Save.MetronomeSave;
+import com.tessari.jamrec.Save.Savable;
+
+public class Metronome implements Savable<MetronomeSave> {
 
     private OnValueChangedListener valueListener;
     private int bpm = 120;
@@ -82,5 +85,23 @@ public class Metronome {
                 tickPlayerUp.start();
             else
                 tickPlayer.start();
+    }
+
+    @Override
+    public String getName() {
+        return "metronome";
+    }
+
+    @Override
+    public MetronomeSave save() {
+        return new MetronomeSave(bpm, tickPerBeat, div, soundEnable);
+    }
+
+    @Override
+    public void restore(MetronomeSave obj) {
+        bpm = obj.getBpm();
+        tickPerBeat = obj.getTickPerBeat();
+        div = obj.getDiv();
+        soundEnable = obj.isSoundEnable();
     }
 }

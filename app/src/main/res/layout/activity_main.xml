@@ -30,6 +30,15 @@
         drawable:layout_constraintStart_toStartOf="parent"
         drawable:layout_constraintTop_toBottomOf="@+id/toolbar">
 
+        <com.tessari.jamrec.CustomView.SavesListView
+            android:id="@+id/saves_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            drawable:layout_constraintEnd_toEndOf="parent"
+            drawable:layout_constraintHeight_max="500dp"
+            drawable:layout_constraintStart_toStartOf="parent"
+            drawable:layout_constraintTop_toTopOf="parent" />
+
         <ScrollView
             android:id="@+id/track_list"
             android:layout_width="0dp"
@@ -38,7 +47,7 @@
             drawable:layout_constraintBottom_toTopOf="@+id/beatsline"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent"
-            drawable:layout_constraintTop_toTopOf="parent">
+            drawable:layout_constraintTop_toBottomOf="@+id/saves_list">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -49,7 +58,7 @@
                 <com.tessari.jamrec.CustomView.AudioWaves
                     android:id="@+id/audioWaves"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="200dp"
                     drawable:layout_constraintBottom_toBottomOf="parent"
                     drawable:layout_constraintEnd_toEndOf="parent"
                     drawable:layout_constraintHorizontal_bias="0.0"
@@ -61,6 +70,7 @@
                     <!--android:layout_height="wrap_content"-->
                     <!--android:orientation="vertical" />-->
                 </com.tessari.jamrec.CustomView.AudioWaves>
+
             </android.support.constraint.ConstraintLayout>
         </ScrollView>
 

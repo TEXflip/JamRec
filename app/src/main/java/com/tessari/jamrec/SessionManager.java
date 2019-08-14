@@ -5,16 +5,22 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.tessari.jamrec.CustomView.AudioWaves;
 import com.tessari.jamrec.CustomView.Beatsline;
 import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
 import com.tessari.jamrec.CustomView.Timeline;
+import com.tessari.jamrec.Save.Savable;
 import com.tessari.jamrec.Util.SupportMath;
+
+import java.io.File;
+import java.util.Date;
 
 public class SessionManager {
     public SessionGestureManager gestureManager;
+    private SessionSaver sessionSaver;
 
     private Activity context;
     public AudioWaves audioWaves;
@@ -33,14 +39,18 @@ public class SessionManager {
 
     @SuppressLint("ClickableViewAccessibility")
     public SessionManager(final Activity context, final int sampleRate, int bufferSize, int audio_encoding, int audio_channel_in, int audio_channel_out) {
-        this.context = context;
+        //region set Views
         this.button_rec = context.findViewById(R.id.recButton);
         this.button_play = context.findViewById(R.id.playButton);
         this.audioWaves = context.findViewById(R.id.audioWaves);
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
+        ListView savedList = context.findViewById(R.id.saves_list);
+        //endregion
+        this.context = context;
         this.sampleRate = sampleRate;
         this.bufferSize = bufferSize;
+
         metronome = new Metronome(MediaPlayer.create(context, R.raw.metronome2), MediaPlayer.create(context, R.raw.metronome));
         metrnomeVisualizer = context.findViewById(R.id.metrnomeVisualizer);
 
@@ -50,6 +60,15 @@ public class SessionManager {
         recorder = new Recorder(sampleRate, bufferSize, audio_encoding, audio_channel_in);
         audioWaves.setTrack(track);
         audioWaves.setSession(this);
+
+        Savable[] objectsToSave = {track, metronome, recorder};
+        sessionSaver = new SessionSaver(objectsToSave, context);
+        /*for (File f: sessionSaver.getSavedFiles()) {
+            savedList.addE
+        }*/
+
+
+        //region set Listeners
         audioWaves.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -156,6 +175,7 @@ public class SessionManager {
                 updateViews();
             }
         });
+        //endregion
     }
 
     public void updateViews() {
@@ -200,6 +220,10 @@ public class SessionManager {
     public void restartPlay() {
         track.resetPlay();
         updateViews();
+    }
+
+    public void saveSession(){
+        sessionSaver.saveSession(new Date().toString());
     }
 
     public boolean isRecording() {
