@@ -35,7 +35,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             drawable:layout_constraintEnd_toEndOf="parent"
-            drawable:layout_constraintHeight_max="500dp"
             drawable:layout_constraintStart_toStartOf="parent"
             drawable:layout_constraintTop_toTopOf="parent" />
 

@@ -1,6 +1,8 @@
 package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.media.VolumeShaper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
@@ -40,13 +42,24 @@ public class SavesListView extends ListView {
         });
     }
 
-
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            this.setVisibility(GONE);
+        else
+            this.setVisibility(VISIBLE);
+    }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,
-                MeasureSpec.AT_MOST);
-        super.onMeasure(widthMeasureSpec, expandSpec);
+//        int[] loc = new int[2];
+//        getLocationOnScreen(loc);
+//        int top = loc[1];
+        int maxHeight = 600;
+
+        if(MeasureSpec.getSize(heightMeasureSpec) > maxHeight)
+            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), maxHeight);
     }
 
     public void setOnFileActionChosenListener(FileSelectionDialog.OnFileActionChosenListener listener){
