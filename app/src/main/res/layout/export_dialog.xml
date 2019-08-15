@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:background="@drawable/card"
+    android:minWidth="@dimen/dialog_min_width"
     android:theme="@style/Theme.AppCompat">
 
     <RadioGroup

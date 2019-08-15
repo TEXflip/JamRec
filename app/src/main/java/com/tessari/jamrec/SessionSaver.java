@@ -2,9 +2,13 @@ package com.tessari.jamrec;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.tessari.jamrec.Save.MetronomeSave;
+import com.tessari.jamrec.Save.RecorderSave;
 import com.tessari.jamrec.Save.Savable;
+import com.tessari.jamrec.Save.TrackSave;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +31,9 @@ public class SessionSaver {
     public SessionSaver(Savable[] savableObjects, Context context) {
         this.context = context;
         this.savableObjects = new HashMap<>();
-        for (Savable s : savableObjects)
-            this.savableObjects.put(s.getName(), s);
+        for (Savable s : savableObjects) {
+            this.savableObjects.put(s.getClass().getSimpleName(), s);
+        }
 //        savePath = context.getDir("saves", Context.MODE_PRIVATE);
         savePath = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MUSIC), "JamRec");
@@ -49,19 +55,31 @@ public class SessionSaver {
 
     public void restoreSession(File restoreFile) {
         String jsonString = readFromFile(restoreFile);
-        Map saving = json.fromJson(jsonString, Map.class);
-
-        for (String s : savableObjects.keySet())
-            savableObjects.get(s).restore(saving.get(s));
+        Log.e("RESTORE SESSION", jsonString );
+        ObjectSaver saving = json.fromJson(jsonString, ObjectSaver.class);
+        try {
+            for (Field f : ObjectSaver.class.getFields()) {
+                if(savableObjects.containsKey(f.getName()))
+                    savableObjects.get(f.getName()).restore(f.get(saving));
+//            savableObjects.get(s).restore(saving.get(s));
+            }
+        }
+        catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
     }
 
     private String readFromFile(File file) {
         try {
             StringBuilder text = new StringBuilder();
-            FileInputStream fileInputStream = new FileInputStream(file);
-            int c;
-            while ((c = fileInputStream.read()) > 0)
-                text.append(c);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
             return text.toString();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -86,6 +104,39 @@ public class SessionSaver {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public class ObjectSaver{
+        public MetronomeSave Metronome;
+        public TrackSave Track;
+        public RecorderSave Recorder;
+
+        public ObjectSaver() {
+        }
+
+        public MetronomeSave getMetronome() {
+            return Metronome;
+        }
+
+        public void setMetronome(MetronomeSave metronome) {
+            Metronome = metronome;
+        }
+
+        public TrackSave getTrack() {
+            return Track;
+        }
+
+        public void setTrack(TrackSave track) {
+            Track = track;
+        }
+
+        public RecorderSave getRecorder() {
+            return Recorder;
+        }
+
+        public void setRecorder(RecorderSave recorder) {
+            Recorder = recorder;
         }
     }
 }

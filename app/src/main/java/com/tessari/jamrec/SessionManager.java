@@ -8,9 +8,11 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
+import com.tessari.jamrec.Activity.FileSelectionDialog;
 import com.tessari.jamrec.CustomView.AudioWaves;
 import com.tessari.jamrec.CustomView.Beatsline;
 import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
+import com.tessari.jamrec.CustomView.SavesListView;
 import com.tessari.jamrec.CustomView.Timeline;
 import com.tessari.jamrec.Save.Savable;
 import com.tessari.jamrec.Util.SupportMath;
@@ -23,6 +25,7 @@ public class SessionManager {
     private SessionSaver sessionSaver;
 
     private Activity context;
+    SavesListView savedList;
     public AudioWaves audioWaves;
     Timeline timeline;
     Beatsline beatsline;
@@ -45,7 +48,7 @@ public class SessionManager {
         this.audioWaves = context.findViewById(R.id.audioWaves);
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
-        ListView savedList = context.findViewById(R.id.saves_list);
+        savedList = context.findViewById(R.id.saves_list);
         //endregion
         this.context = context;
         this.sampleRate = sampleRate;
@@ -63,12 +66,24 @@ public class SessionManager {
 
         Savable[] objectsToSave = {track, metronome, recorder};
         sessionSaver = new SessionSaver(objectsToSave, context);
-        /*for (File f: sessionSaver.getSavedFiles()) {
-            savedList.addE
-        }*/
+        savedList.setFiles(sessionSaver.getSavedFiles());
 
 
         //region set Listeners
+        savedList.setOnFileActionChosenListener(new FileSelectionDialog.OnFileActionChosenListener() {
+            @Override
+            public void onOpen(File target) {
+                sessionSaver.restoreSession(target);
+                updateViews();
+            }
+
+            @Override
+            public void onDelete(File target) {
+                target.delete();
+                savedList.setFiles(sessionSaver.getSavedFiles());
+            }
+        });
+
         audioWaves.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -222,8 +237,9 @@ public class SessionManager {
         updateViews();
     }
 
-    public void saveSession(){
-        sessionSaver.saveSession(new Date().toString());
+    public void saveSession(String name){
+        sessionSaver.saveSession(name);
+        savedList.setFiles(sessionSaver.getSavedFiles());
     }
 
     public boolean isRecording() {

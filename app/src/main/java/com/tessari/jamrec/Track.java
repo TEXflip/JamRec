@@ -210,11 +210,6 @@ public class Track implements Savable<TrackSave> {
     }
 
     @Override
-    public String getName() {
-        return "track";
-    }
-
-    @Override
     public TrackSave save() {
         TrackSave save = new TrackSave();
         save.setTrackSamples(trackSamples);

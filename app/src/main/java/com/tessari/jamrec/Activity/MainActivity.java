@@ -98,7 +98,14 @@ public class MainActivity extends AppCompatActivity {
                 session.track.resetAudio();
                 return true;
             case R.id.save:
-                session.saveSession();
+                SaveDialog sd = new SaveDialog(this);
+                sd.setOnSaveListener(new SaveDialog.OnSaveListener() {
+                    @Override
+                    public void onSave(String name) {
+                        session.saveSession(name);
+                    }
+                });
+                sd.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

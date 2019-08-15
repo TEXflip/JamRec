@@ -41,11 +41,6 @@ class Recorder implements Savable<RecorderSave> {
     }
 
     @Override
-    public String getName() {
-        return "recorder";
-    }
-
-    @Override
     public RecorderSave save() {
         RecorderSave save = new RecorderSave();
         save.setBufferSize(bufferSize);

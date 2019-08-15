@@ -16,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 
-import com.tessari.jamrec.BuildConfig;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Codec.WaveWriter;

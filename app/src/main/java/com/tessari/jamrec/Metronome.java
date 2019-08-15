@@ -88,20 +88,15 @@ public class Metronome implements Savable<MetronomeSave> {
     }
 
     @Override
-    public String getName() {
-        return "metronome";
-    }
-
-    @Override
     public MetronomeSave save() {
         return new MetronomeSave(bpm, tickPerBeat, div, soundEnable);
     }
 
     @Override
     public void restore(MetronomeSave obj) {
-        bpm = obj.getBpm();
-        tickPerBeat = obj.getTickPerBeat();
-        div = obj.getDiv();
+        setBpm(obj.getBpm());
+        setTickPerBeat(obj.getTickPerBeat());
+        setDiv(obj.getDiv());
         soundEnable = obj.isSoundEnable();
     }
 }

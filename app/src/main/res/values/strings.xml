@@ -21,11 +21,14 @@
     <string name="m4a_format">M4A</string>
     <string name="wma_format">WMA</string>
 
-    <string name="checkBox_sew_the_ends">Sew the ends</string>
+    <string name="checkBox_sew_the_ends">Cut</string>
 
     <string name="button_export">Export</string>
-    <string name="button_delete">Delete Selection</string>
+    <string name="button_delete_selection">Silence Selection</string>
     <string name="button_share">Share</string>
+    <string name="button_save">Save</string>
+    <string name="button_open">Open</string>
+    <string name="button_delete">Delete</string>
     <string name="codec">Choose Format:</string>
 
     <string name="emptyTrackMessage">The track is empty</string>

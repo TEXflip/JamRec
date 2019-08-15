@@ -6,4 +6,5 @@
     <dimen name="timeline_height">75px</dimen>
     <dimen name="beatsline_height">75px</dimen>
     <dimen name="metronome_height">75px</dimen>
+    <dimen name="dialog_min_width">200dp</dimen>
 </resources>
