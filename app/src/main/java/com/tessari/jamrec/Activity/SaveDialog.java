@@ -2,8 +2,11 @@ package com.tessari.jamrec.Activity;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,12 +27,10 @@ public class SaveDialog extends Dialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.save_dialog);
 
-        final ProgressBar progressSave = findViewById(R.id.progress_save);
-
         final EditText editTextFileName = findViewById(R.id.file_name_save);
         editTextFileName.setText(android.text.format.DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()));
 
-        ((ImageButton)findViewById(R.id.clear_button_save)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clear_button_save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editTextFileName.setText("");
@@ -39,20 +40,47 @@ public class SaveDialog extends Dialog {
         findViewById(R.id.button_save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progressSave.setVisibility(View.VISIBLE);
-                if(saveListener != null)
-                    saveListener.onSave(editTextFileName.getText().toString());
-                progressSave.setVisibility(View.GONE);
-                dismiss();
+                new SaveTask(saveListener, editTextFileName.getText().toString()).execute();
             }
         });
     }
 
-    public void setOnSaveListener(OnSaveListener listener){
+    public void setOnSaveListener(OnSaveListener listener) {
         this.saveListener = listener;
     }
 
-    public interface OnSaveListener{
+    public interface OnSaveListener {
         void onSave(String name);
+    }
+
+    private class SaveTask extends AsyncTask<Void, Void, Void> {
+
+        OnSaveListener saveListener;
+        String text;
+
+        public SaveTask(OnSaveListener saveListener, String text) {
+            this.saveListener = saveListener;
+            this.text = text;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (saveListener != null)
+                saveListener.onSave(text);
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            findViewById(R.id.progress_save).setVisibility(View.VISIBLE);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            findViewById(R.id.progress_save).setVisibility(View.GONE);
+            dismiss();
+            super.onPostExecute(aVoid);
+        }
     }
 }

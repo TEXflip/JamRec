@@ -80,7 +80,7 @@ public class SessionManager {
             @Override
             public void onDelete(File target) {
                 target.delete();
-                savedList.setFiles(sessionSaver.getSavedFiles());
+                updateSaveList();
             }
         });
 
@@ -205,6 +205,15 @@ public class SessionManager {
         });
     }
 
+    private void updateSaveList(){
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                savedList.setFiles(sessionSaver.getSavedFiles());
+            }
+        });
+    }
+
     public void startRec() {
         if (!isPlaying()) {
             recorder.startToRec();
@@ -239,7 +248,7 @@ public class SessionManager {
 
     public void saveSession(String name){
         sessionSaver.saveSession(name);
-        savedList.setFiles(sessionSaver.getSavedFiles());
+        updateSaveList();
     }
 
     public boolean isRecording() {
