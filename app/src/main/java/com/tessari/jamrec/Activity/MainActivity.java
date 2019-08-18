@@ -2,6 +2,7 @@ package com.tessari.jamrec.Activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -97,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
                 session.pausePlay();
                 session.track.resetAudio();
                 return true;
-            case R.id.save:
-                SaveDialog sd = new SaveDialog(this);
+            case R.id.save_with_name:
+                SaveDialog sd = new SaveDialog(this, true);
                 sd.setOnSaveListener(new SaveDialog.OnSaveListener() {
                     @Override
                     public void onSave(String name) {
@@ -106,6 +107,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 sd.show();
+                return true;
+            case R.id.save:
+                SaveDialog sdNoName = new SaveDialog(this, false);
+                sdNoName.setOnSaveListener(new SaveDialog.OnSaveListener() {
+                    @Override
+                    public void onSave(String name) {
+                        session.saveSession(null);
+                    }
+                });
+                sdNoName.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import com.tessari.jamrec.Activity.FileSelectionDialog;
@@ -18,11 +17,11 @@ import com.tessari.jamrec.Save.Savable;
 import com.tessari.jamrec.Util.SupportMath;
 
 import java.io.File;
-import java.util.Date;
 
-public class SessionManager {
+public class SessionManager implements NamedSession{
     public SessionGestureManager gestureManager;
     private SessionSaver sessionSaver;
+    private String sessionName = null;
 
     private Activity context;
     SavesListView savedList;
@@ -65,7 +64,7 @@ public class SessionManager {
         audioWaves.setSession(this);
 
         Savable[] objectsToSave = {track, metronome, recorder};
-        sessionSaver = new SessionSaver(objectsToSave, context);
+        sessionSaver = new SessionSaver(objectsToSave, this, context);
         savedList.setFiles(sessionSaver.getSavedFiles());
 
 
@@ -73,6 +72,7 @@ public class SessionManager {
         savedList.setOnFileActionChosenListener(new FileSelectionDialog.OnFileActionChosenListener() {
             @Override
             public void onOpen(File target) {
+
                 sessionSaver.restoreSession(target);
                 updateViews();
             }
@@ -342,5 +342,21 @@ public class SessionManager {
     public int fromSamplesIndexToViewIndex(int i, int width) {
         double start1 = offset - trackViewWidth / 2f;
         return (int) (((i - start1) / trackViewWidth) * width);
+    }
+
+    @Override
+    public void setSessionName(String name) {
+        sessionName = name;
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                context.setTitle(sessionName);
+            }
+        });
+    }
+
+    @Override
+    public String getSessionName() {
+        return sessionName;
     }
 }

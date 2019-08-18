@@ -12,7 +12,6 @@ import com.tessari.jamrec.Save.TrackSave;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -27,25 +26,33 @@ public class SessionSaver {
     private Map<String, Savable> savableObjects;
     private Gson json;
     private File savePath;
+    private NamedSession namedSession;
 
-    public SessionSaver(Savable[] savableObjects, Context context) {
+    public SessionSaver(Savable[] savableObjects, NamedSession namedSession, Context context) {
         this.context = context;
+        this.namedSession = namedSession;
         this.savableObjects = new HashMap<>();
         for (Savable s : savableObjects) {
             this.savableObjects.put(s.getClass().getSimpleName(), s);
         }
-//        savePath = context.getDir("saves", Context.MODE_PRIVATE);
-        savePath = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MUSIC), "JamRec");
+        savePath = context.getDir("saves", Context.MODE_PRIVATE);
+//        savePath = new File(Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_MUSIC), "JamRec");
         savePath.mkdirs();
         json = new Gson();
     }
 
-    public File[] getSavedFiles(){
+    public File[] getSavedFiles() {
         return savePath.listFiles();
     }
 
     public void saveSession(String name) {
+        if (name == null)
+            if (namedSession.getSessionName() != null)
+                name = namedSession.getSessionName();
+            else
+                name = android.text.format.DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString();
+        namedSession.setSessionName(name);
         Map<String, Object> saving = new HashMap<>();
         for (String s : savableObjects.keySet())
             saving.put(s, savableObjects.get(s).save());
@@ -54,17 +61,19 @@ public class SessionSaver {
     }
 
     public void restoreSession(File restoreFile) {
+        String sessionName = restoreFile.getName();
+        sessionName = sessionName.substring(0, sessionName.lastIndexOf('.'));
+        namedSession.setSessionName(sessionName);
         String jsonString = readFromFile(restoreFile);
-        Log.e("RESTORE SESSION", jsonString );
+        Log.e("RESTORE SESSION", jsonString);
         ObjectSaver saving = json.fromJson(jsonString, ObjectSaver.class);
         try {
             for (Field f : ObjectSaver.class.getFields()) {
-                if(savableObjects.containsKey(f.getName()))
+                if (savableObjects.containsKey(f.getName()))
                     savableObjects.get(f.getName()).restore(f.get(saving));
 //            savableObjects.get(s).restore(saving.get(s));
             }
-        }
-        catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -107,7 +116,7 @@ public class SessionSaver {
         }
     }
 
-    public class ObjectSaver{
+    public class ObjectSaver {
         public MetronomeSave Metronome;
         public TrackSave Track;
         public RecorderSave Recorder;

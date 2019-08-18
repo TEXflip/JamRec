@@ -8,6 +8,7 @@
     <string name="menu_metronome">Metronome</string>
     <string name="menu_reset">Clean Track</string>
     <string name="menu_save">Save</string>
+    <string name="menu_save_with_name">Save New</string>
     <string name="menu_export">Export</string>
 
     <string name="metronome_show">Show</string>
@@ -32,6 +33,7 @@
     <string name="codec">Choose Format:</string>
 
     <string name="emptyTrackMessage">The track is empty</string>
+    <string name="saved">Saved</string>
     <string name="exportError">Error during the export, retry or use the WAV format</string>
     <string name="exportErrorLoadLibray">Your device can export only in WAV</string>
 </resources>
