@@ -30,23 +30,34 @@
         drawable:layout_constraintStart_toStartOf="parent"
         drawable:layout_constraintTop_toBottomOf="@+id/toolbar">
 
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            drawable:layout_constraintGuide_end="300dp" />
+
         <com.tessari.jamrec.CustomView.SavesListView
             android:id="@+id/saves_list"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            drawable:layout_constraintBottom_toTopOf="@+id/guideline"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent"
-            drawable:layout_constraintTop_toTopOf="parent" />
+            drawable:layout_constraintTop_toTopOf="parent">
+
+        </com.tessari.jamrec.CustomView.SavesListView>
 
         <ScrollView
             android:id="@+id/track_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             android:fillViewport="true"
             drawable:layout_constraintBottom_toTopOf="@+id/beatsline"
             drawable:layout_constraintEnd_toEndOf="parent"
             drawable:layout_constraintStart_toStartOf="parent"
-            drawable:layout_constraintTop_toBottomOf="@+id/saves_list">
+            drawable:layout_constraintTop_toTopOf="@+id/guideline">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -79,7 +90,6 @@
             android:layout_height="@dimen/beatsline_height"
             drawable:layout_constraintBottom_toTopOf="@+id/timeline"
             drawable:layout_constraintEnd_toEndOf="parent"
-            drawable:layout_constraintHorizontal_bias="0.0"
             drawable:layout_constraintStart_toStartOf="parent" />
 
         <com.tessari.jamrec.CustomView.Timeline

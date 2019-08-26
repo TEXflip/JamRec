@@ -2,21 +2,28 @@ package com.tessari.jamrec;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.media.AudioFormat;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ToggleButton;
 
 import com.tessari.jamrec.Activity.FileSelectionDialog;
+import com.tessari.jamrec.Codec.WaveReader;
 import com.tessari.jamrec.CustomView.AudioWaves;
 import com.tessari.jamrec.CustomView.Beatsline;
 import com.tessari.jamrec.CustomView.MetrnomeVisualizer;
 import com.tessari.jamrec.CustomView.SavesListView;
 import com.tessari.jamrec.CustomView.Timeline;
 import com.tessari.jamrec.Save.Savable;
+import com.tessari.jamrec.Save.TrackSave;
+import com.tessari.jamrec.Util.CustomToast;
 import com.tessari.jamrec.Util.SupportMath;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Vector;
 
 public class SessionManager implements NamedSession{
     public SessionGestureManager gestureManager;
@@ -48,6 +55,7 @@ public class SessionManager implements NamedSession{
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         savedList = context.findViewById(R.id.saves_list);
+        savedList.setViewToConstrain(audioWaves);
         //endregion
         this.context = context;
         this.sampleRate = sampleRate;
@@ -249,6 +257,65 @@ public class SessionManager implements NamedSession{
     public void saveSession(String name){
         sessionSaver.saveSession(name);
         updateSaveList();
+    }
+
+    public void import_file(File file){
+        String filePath = file.getPath();
+        Log.e("AAAAAAAAAAAAAAAAA", filePath.substring(filePath.lastIndexOf(".")) );
+        if (!".wav".equals(filePath.substring(filePath.lastIndexOf(".")).trim().toLowerCase())) {
+            CustomToast.showErrorToast(context, "Format Not Supported");
+            return;
+        }
+
+        WaveReader waveReader = new WaveReader(file);
+
+        try {
+            waveReader.openWave();
+        } catch (IOException e) {
+            CustomToast.showErrorToast(context, e.getMessage());
+            return;
+        }
+
+        if (waveReader.getChannels() != 1) {
+            CustomToast.showErrorToast(context, "Stereo not supported");
+            return;
+        }
+
+        TrackSave save = new TrackSave();
+        save.setAudio_channel_out(AudioFormat.CHANNEL_OUT_MONO);
+        save.setAudio_encoding(AudioFormat.ENCODING_PCM_16BIT);
+        save.setBufferSize(bufferSize);
+        save.setSampleRate(waveReader.getSampleRate());
+        save.setData(new short[bufferSize]);
+
+        Vector<short[]> trackSamples = new Vector<>();
+        for (int i = 0; i < waveReader.getDataSize() / bufferSize; i++) {
+            short[] chunk = new short[bufferSize];
+
+            try {
+                waveReader.read(chunk, bufferSize);
+            } catch (IOException e) {
+                CustomToast.showErrorToast(context, "Error reading the file");
+            }
+            trackSamples.add(chunk);
+        }
+        int remaning = waveReader.getDataSize() % bufferSize;
+        if(remaning != 0)
+        {
+            short[] chunk = new short[remaning];
+
+            try {
+                waveReader.read(chunk, remaning);
+            } catch (IOException e) {
+                CustomToast.showErrorToast(context, "Error reading the file");
+            }
+            trackSamples.add(chunk);
+        }
+
+        save.setTrackSamples(trackSamples);
+        save.setMaxRecPos(waveReader.getDataSize());
+
+        track.restore(save);
     }
 
     public boolean isRecording() {

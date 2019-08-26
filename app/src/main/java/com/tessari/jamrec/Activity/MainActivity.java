@@ -3,10 +3,14 @@ package com.tessari.jamrec.Activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioFormat;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -22,9 +26,13 @@ import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Util.CustomToast;
 
+import java.io.File;
+
+
 public class MainActivity extends AppCompatActivity {
     SessionManager session;
     int bufferSize, sampleRate = 44100, audio_encoding = AudioFormat.ENCODING_PCM_16BIT, audio_channel_in = AudioFormat.CHANNEL_IN_MONO, audio_channel_out = AudioFormat.CHANNEL_OUT_MONO;
+    private static final short REQ_CODE_IMPORT = 5261;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -93,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
                     ed.show();
                 }
                 return true;
+            case R.id.import_audio:
+
+                Intent intentImport = new Intent(Intent.ACTION_GET_CONTENT).setType("audio/wav");
+                startActivityForResult(Intent.createChooser(intentImport, "Select a file"), REQ_CODE_IMPORT);
+                return true;
             case R.id.reset:
                 session.stopRec();
                 session.pausePlay();
@@ -122,5 +135,35 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Dialog waitingDialog = new Dialog(this);
+        waitingDialog.setContentView(R.layout.waiting_dialog);
+        waitingDialog.show();
+        if (requestCode == REQ_CODE_IMPORT && resultCode == RESULT_OK) {
+            String path = getPathFromURI(data.getData());
+            if(path != null) {
+                File file = new File(path);
+                session.import_file(file);
+            }
+            else
+                CustomToast.showErrorToast(this, "Can't open the file");
+        }
+        waitingDialog.dismiss();
+    }
+
+    private String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Audio.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
     }
 }

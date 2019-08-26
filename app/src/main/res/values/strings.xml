@@ -10,6 +10,7 @@
     <string name="menu_save">Save</string>
     <string name="menu_save_with_name">Save New</string>
     <string name="menu_export">Export</string>
+    <string name="menu_import">Import</string>
 
     <string name="metronome_show">Show</string>
     <string name="metronome_enable_sound">Sound</string>

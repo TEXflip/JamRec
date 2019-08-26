@@ -2,14 +2,18 @@ package com.tessari.jamrec.CustomView;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.media.VolumeShaper;
+import android.graphics.Point;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.tessari.jamrec.Activity.FileSelectionDialog;
+import com.tessari.jamrec.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,10 +22,14 @@ public class SavesListView extends ListView {
 
     File[] files;
     FileSelectionDialog.OnFileActionChosenListener fileActionChosenListener;
+    View view;
+    int top1 = 0, top2 = 0;
 
     public SavesListView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
+
 
     public void setFiles(final File[] files) {
         this.files = files;
@@ -51,15 +59,18 @@ public class SavesListView extends ListView {
             this.setVisibility(VISIBLE);
     }
 
+    public void setViewToConstrain(View view){
+        this.view = view;
+    }
+
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        int[] loc = new int[2];
-//        getLocationOnScreen(loc);
-//        int top = loc[1];
-        int maxHeight = 600;
 
-        if(MeasureSpec.getSize(heightMeasureSpec) > maxHeight)
-            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), maxHeight);
+        //int maxHeight = (int) getResources().getDimension(R.dimen.saveList_max_height);
+
+
+//        if(MeasureSpec.getSize(heightMeasureSpec) > maxHeight)
+            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), heightMeasureSpec);
     }
 
     public void setOnFileActionChosenListener(FileSelectionDialog.OnFileActionChosenListener listener){

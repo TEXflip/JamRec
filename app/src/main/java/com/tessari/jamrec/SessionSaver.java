@@ -1,7 +1,6 @@
 package com.tessari.jamrec;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import com.google.gson.Gson;
