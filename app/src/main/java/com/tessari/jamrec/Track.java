@@ -9,6 +9,9 @@ import com.tessari.jamrec.Util.SupportMath;
 
 import java.util.Vector;
 
+/**
+ * traccia della sessione
+ */
 public class Track implements Savable<TrackSave> {
 
     private short[] data;
@@ -93,6 +96,11 @@ public class Track implements Savable<TrackSave> {
         return isPlaying;
     }
 
+    /**
+     * scrive un buffersize di sample nella track
+     *
+     * @param elem
+     */
     void write(short[] elem) {
         for (int i = 0; i < elem.length; i++) {
             if (syncActivation) {
@@ -120,6 +128,12 @@ public class Track implements Savable<TrackSave> {
         }
     }
 
+    /**
+     * legge un sample nella track
+     *
+     * @param index
+     * @return 0 se é fuori range
+     */
     public short read(int index) {
         if (SupportMath.floorDiv(index, bufferSize) >= SupportMath.floorDiv(maxRecPos - 1, bufferSize) || index < 0)
             return 0;

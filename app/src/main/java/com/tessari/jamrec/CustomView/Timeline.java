@@ -10,6 +10,9 @@ import android.view.View;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 
+/**
+ * linea del tempo
+ */
 public class Timeline extends View {
     private Paint linesColor, blue;
     private SessionManager session;

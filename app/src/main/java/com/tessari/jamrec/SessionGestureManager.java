@@ -8,6 +8,9 @@ import android.view.ScaleGestureDetector;
 
 import com.tessari.jamrec.Activity.SelectionDialog;
 
+/**
+ * modulo che si occupa dell'IO della sessione
+ */
 public class SessionGestureManager {
     SessionManager session;
 

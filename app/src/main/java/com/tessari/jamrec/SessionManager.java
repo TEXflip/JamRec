@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ToggleButton;
@@ -25,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
-public class SessionManager implements NamedSession{
+public class SessionManager implements NamedSession {
     public SessionGestureManager gestureManager;
     private SessionSaver sessionSaver;
     private String sessionName = null;
@@ -55,7 +54,6 @@ public class SessionManager implements NamedSession{
         this.timeline = context.findViewById(R.id.timeline);
         this.beatsline = context.findViewById(R.id.beatsline);
         savedList = context.findViewById(R.id.saves_list);
-        savedList.setViewToConstrain(audioWaves);
         //endregion
         this.context = context;
         this.sampleRate = sampleRate;
@@ -213,7 +211,7 @@ public class SessionManager implements NamedSession{
         });
     }
 
-    private void updateSaveList(){
+    private void updateSaveList() {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -254,14 +252,18 @@ public class SessionManager implements NamedSession{
         updateViews();
     }
 
-    public void saveSession(String name){
+    public void saveSession(String name) {
         sessionSaver.saveSession(name);
         updateSaveList();
     }
 
-    public void import_file(File file){
+    /**
+     * importa un file wav e lo carica nella track
+     *
+     * @param file
+     */
+    public void import_file(File file) {
         String filePath = file.getPath();
-        Log.e("AAAAAAAAAAAAAAAAA", filePath.substring(filePath.lastIndexOf(".")) );
         if (!".wav".equals(filePath.substring(filePath.lastIndexOf(".")).trim().toLowerCase())) {
             CustomToast.showErrorToast(context, "Format Not Supported");
             return;
@@ -300,8 +302,7 @@ public class SessionManager implements NamedSession{
             trackSamples.add(chunk);
         }
         int remaning = waveReader.getDataSize() % bufferSize;
-        if(remaning != 0)
-        {
+        if (remaning != 0) {
             short[] chunk = new short[remaning];
 
             try {
@@ -389,6 +390,14 @@ public class SessionManager implements NamedSession{
         track.setRecPos((int) (track.getRecPos() + x * getViewsRatio()));
     }
 
+    /**
+     * converte una posizione dell'asse X in pixel e restituisce la posizione in samples
+     * applicando lo zoom e l'offset
+     *
+     * @param i
+     * @param width
+     * @return
+     */
     public int fromViewIndexToSamplesIndex(int i, int width) {
         // il rapporto dev'essere approssimato per difetto
         int widthRatio = SupportMath.floorDiv(trackViewWidth, width);
@@ -402,10 +411,19 @@ public class SessionManager implements NamedSession{
 
         // quando é molto zoommato l'approssimazione del widthRatio rende lo zoom scattoso, in questo modo si aggira il problema
         float retWidthRatio = widthRatio <= 18 ? ((float) trackViewWidth / (float) width) : widthRatio;
-//        retWidthRatio = ((float) trackViewWidth / (float) width);
+
+        //retWidthRatio = ((float) trackViewWidth / (float) width);
         return start2 + (int) (i * retWidthRatio);
     }
 
+    /**
+     * prende la posizione di un sample e restituisce la posizione in pixel nella view
+     * applicando zoom e offset
+     *
+     * @param i
+     * @param width
+     * @return
+     */
     public int fromSamplesIndexToViewIndex(int i, int width) {
         double start1 = offset - trackViewWidth / 2f;
         return (int) (((i - start1) / trackViewWidth) * width);

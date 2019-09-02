@@ -5,12 +5,15 @@ import android.media.MediaPlayer;
 import com.tessari.jamrec.Save.MetronomeSave;
 import com.tessari.jamrec.Save.Savable;
 
+/**
+ * metronomo della sessione
+ */
 public class Metronome implements Savable<MetronomeSave> {
 
     private OnValueChangedListener valueListener;
-    private int bpm = 120;
-    private int tickPerBeat = 4;
-    private int div = 4;
+    private int bpm = 120; // battiti per minuto
+    private int tickPerBeat = 4; // battiti per battuta
+    private int div = 4; // divisore dei battiti nel tempo
     private MediaPlayer tickPlayerUp, tickPlayer;
     public boolean soundEnable = false;
 
@@ -25,10 +28,20 @@ public class Metronome implements Savable<MetronomeSave> {
         this.div = div;
     }
 
+    /**
+     * converte i secondi in numero di battiti
+     * @param sec
+     * @return
+     */
     public double fromSecToTicks(double sec) {
         return sec * (bpm / 60.) * (div / 4.);
     }
 
+    /**
+     * converte il numero di battiti in secondi
+     * @param ticks
+     * @return
+     */
     public double fromTicksToSec(double ticks) {
         return ticks / ((bpm / 60.) * (div / 4.));
     }

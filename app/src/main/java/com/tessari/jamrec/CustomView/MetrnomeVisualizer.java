@@ -10,6 +10,9 @@ import android.view.View;
 
 import com.tessari.jamrec.R;
 
+/**
+ * barra del metronomo
+ */
 public class MetrnomeVisualizer extends View {
 
     private final float blockspacingX = 20, blockspacingY = 10;

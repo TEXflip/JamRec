@@ -19,6 +19,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * modulo che si occupa del salvataggio della sessione
+ */
 public class SessionSaver {
 
     private Context context;

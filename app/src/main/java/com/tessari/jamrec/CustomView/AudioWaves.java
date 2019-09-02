@@ -11,6 +11,9 @@ import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Track;
 
+/**
+ * view della traccia
+ */
 public class AudioWaves extends View {
 
 

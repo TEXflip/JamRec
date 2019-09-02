@@ -1,22 +1,21 @@
 package com.tessari.jamrec.CustomView;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.tessari.jamrec.R;
-import com.tessari.jamrec.Util.SupportMath;
 
+/**
+ * selettore dei battiti al minuto
+ */
 public class BPMSelector extends View {
 
     private OnBpmChangeListener bpmListener;

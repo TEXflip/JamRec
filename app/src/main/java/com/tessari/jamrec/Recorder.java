@@ -6,6 +6,9 @@ import android.media.MediaRecorder;
 import com.tessari.jamrec.Save.RecorderSave;
 import com.tessari.jamrec.Save.Savable;
 
+/**
+ * registratore della sessione
+ */
 class Recorder implements Savable<RecorderSave> {
     private AudioRecord recorder;
     private OnNewBufferReadListener readListener;

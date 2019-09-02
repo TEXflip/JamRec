@@ -14,6 +14,9 @@ import com.tessari.jamrec.CustomView.Timebars;
 import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 
+/**
+ * linea dei battiti
+ */
 public class Beatsline extends View {
 
     private Timebars lines;

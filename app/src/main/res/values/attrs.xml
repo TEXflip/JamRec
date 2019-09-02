@@ -11,4 +11,7 @@
     <declare-styleable name="BPMSelector">
     </declare-styleable>
 
+    <integer name="buffersize">1024</integer>
+    <integer name="samplerate">44100</integer>
+
 </resources>

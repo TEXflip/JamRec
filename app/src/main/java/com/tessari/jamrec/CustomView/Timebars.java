@@ -9,6 +9,9 @@ import com.tessari.jamrec.R;
 import com.tessari.jamrec.SessionManager;
 import com.tessari.jamrec.Util.SupportMath;
 
+/**
+ * classe per semplificare la gestione del disegno delle bearre del tempo/battiti
+ */
 public class Timebars {
     private final long[] reduxFactorsTime = {0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 60000, 60000 * 2, 60000 * 5, 60000 * 10, 60000 * 20, 60000 * 60, 60000 * 60 * 2, 60000 * 60 * 5, 60000 * 60 * 10, 60000 * 60 * 20, 60000 * 60 * 24};
     private final double[] reduxFactorsTicks = {0, 0.03125, 0.0625, 0.125, 0.25, 0.5, 1};
@@ -32,6 +35,13 @@ public class Timebars {
         textColor.setTextAlign(Paint.Align.CENTER);
     }
 
+    /**
+     * disegna le barre del tempo
+     * @param c
+     * @param width
+     * @param mainHeight
+     * @param halfHeight
+     */
     public void drawTime(Canvas c, int width, int mainHeight, int halfHeight) {
         double firstSec = 1000 * (session.getOffsetAt0() / (double) session.getSampleRate()); // il secondo che si trova piú a sinistra della view in ms
         float viewWidthInSec = session.getTrackViewWidth() / (float) session.getSampleRate(); // lunghezza in secondi della view
@@ -55,6 +65,13 @@ public class Timebars {
         }
     }
 
+    /**
+     * disegna le barre dei battiti
+     * @param c
+     * @param width
+     * @param mainHeight
+     * @param halfHeight
+     */
     public void drawBeat(Canvas c, int width, int mainHeight, int halfHeight) {
         double firstBeat = session.metronome.fromSecToTicks(session.getOffsetAt0() / (double) session.getSampleRate());
         double viewWidthInTicks = session.metronome.fromSecToTicks(session.getTrackViewWidth() / (double) session.getSampleRate());
@@ -147,6 +164,11 @@ public class Timebars {
         }
     }
 
+    /**
+     * formatta il valore del tempo nella timeline
+     * @param millis
+     * @return
+     */
     private String toTime(long millis) {
         if (millis == 0) return "" + 0;
         //String neg = millis < 0 ? "-" : "";
