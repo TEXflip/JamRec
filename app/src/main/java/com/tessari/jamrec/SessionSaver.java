@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +47,14 @@ public class SessionSaver {
     }
 
     public File[] getSavedFiles() {
-        return savePath.listFiles();
+        File[] files = savePath.listFiles();
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file, File t1) {
+                return -(int)(file.lastModified() - t1.lastModified());
+            }
+        });
+        return files;
     }
 
     public void saveSession(String name) {
