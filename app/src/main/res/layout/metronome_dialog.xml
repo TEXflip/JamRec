@@ -36,13 +36,12 @@
         android:id="@+id/textview_Div"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
         android:text="4"
         android:textAlignment="center"
         android:textColor="@color/Text"
         android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekbar_tickPerBeat" />
+        app:layout_constraintEnd_toEndOf="@+id/textview_TickPerBeats"
+        app:layout_constraintTop_toBottomOf="@+id/textview_TickPerBeats" />
 
     <TextView
         android:id="@+id/textview_TickPerBeats"
